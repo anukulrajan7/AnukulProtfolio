@@ -14,121 +14,71 @@ Every time I think "this time I'll do it right," I catch myself falling into the
 
 This is the trap I fall into the most.
 
-A feature request comes in. On paper or in a discussion, it looks simple. Clean. Straightforward. And then something happens in my head — *"I know this. I've built something similar. Let me just start coding."*
+A feature request comes in. On paper or in a discussion, it looks simple. Straightforward. And then something happens in my head — I know this, I've built something similar, let me just start coding.
 
-I skip analyzing the actual impact. I don't ask — why does the customer want this? How does it align with the product? What's the real problem being solved here?
+I skip analyzing the actual impact. I don't ask — why does the customer want this? How does it align with the product? What's the real problem being solved here? I just jump to the solution I already know.
 
-I just jump to the solution I already know.
+Just last week, this happened to me. A client request came in. Instead of discussing it with the team, I went ahead and built the full picture myself. I solved most of the user problems — but then I kept going. I added export functionality, migration flows, things that felt related to me but weren't actually needed for what was requested.
 
-**Just last week, this happened to me.** A client request came in. Instead of discussing it with the team, I went ahead and built the full picture myself. I solved most of the user problems — but then I kept going. I added export functionality, migration flows, things that felt related to me but weren't actually needed for what was requested.
+I made a small request into something big. Because in my head, if I'm building this, might as well build it complete. Turns out nobody needed the export and migration part. I just added it because it felt incomplete to me.
 
-I made a small request into something big. Because in my head, "if I'm building this, might as well build it complete."
-
-Turns out nobody needed the export and migration part. I just added it because it felt incomplete to me.
-
-What I'm trying to do differently now:
-
-- **Understand the "why"** — Talk to the person who raised the request. Why do they want it?
-- **Product alignment** — Does this fit where the product is heading? If I don't know, I ask someone who does.
-- **User benefit** — How does the end user actually gain from this?
-- **Discuss with the team first** — Before building the full picture alone. Get different points of view.
-- **Build what's asked, not what you imagine** — Export, migrate, all that can come later. Solve the core problem first.
-- **Code design first, code last** — Think about the architecture before writing a single line.
-- **Document it** — Even a simple PRD. From now on, I'm writing one before building any feature. Simple things become complex when there's no documentation.
+What I'm trying to do now is simple — understand why the request exists, check if it aligns with the product, discuss with the team before building the full picture alone, and document even a small PRD before writing code.
 
 ## 2. Personal Biases Are Real — Filter Yourself First
 
-I know I get self-biased. *"This feature should look like this." "This approach is better."* I've pushed my opinions on teams many times. Most of the time, I was wrong. Sometimes I was right — but even then, I didn't have a solid answer for "why this way?"
+I know I get self-biased. This feature should look like this. This approach is better. I've pushed my opinions on teams many times. Most of the time, I was wrong. Sometimes I was right — but even then, I didn't have a solid answer for why this way.
 
-**That same feature from last week?** After I built it, the team came with UI/UX suggestions. And I didn't accept them. Not because their suggestions were wrong — but because I'd already built it my way, and changing it felt like admitting my version wasn't good enough.
+That same feature from last week? After I built it, the team came with UI/UX suggestions. And I didn't accept them. Not because their suggestions were wrong — but because I'd already built it my way, and changing it felt like admitting my version wasn't good enough.
 
 Now I'm stuck. The feature is built, but there's friction with the team, and I know deep down some of their suggestions actually made sense.
 
-The worst part? When someone — a colleague, a senior, even the founder — suggests something different, I feel frustrated. Angry, even. Because in my head, my point is right. But their point might also be right. And I'm not listening because I've already decided.
+When someone — a colleague, a senior, even the founder — suggests something different, I feel frustrated. Because in my head, my point is right. But their point might also be right. And I'm not listening because I've already decided.
 
-The same goes the other way too. Founders, seniors, colleagues — everyone carries biases. It's human. But the first person you need to filter is yourself.
+Everyone carries biases. Founders, seniors, colleagues. But the first person you need to filter is yourself. Build the feature, present it, explain your approach, and then actually listen. Even the silly suggestions — take patience. I'm not good at this yet, but I'm trying.
 
-What I'm trying to change:
-
-- Build the feature, then present it to the team. Explain your approach. Then **actually listen** — their thoughts, their doubts, their way of implementing it.
-- Even the "silly" suggestions — take patience. I'm not good at this yet, but I'm trying.
-- Same for UI perspectives — understand why they want what they want. What's the reasoning?
-- **Accept when your idea gets declined.** It stings, but it's not about you.
-- Respect their thoughts. When you listen to a different angle, your own vision changes. You see things you couldn't see before.
-- Remember — these people might be your future users. Even if 5% of their feedback matters, it matters.
-
-And the biggest one: **Code is cheap. Ship early.**
-
-If you're at 50-60% done, it's good enough to show the user. 70-80% is better. 80-90% is an excellent job. But that last 10%? You don't know what happens until a real user touches it. So don't wait for perfection — speed and timing matter a lot. Ship first, get rejected, improve, repeat.
+And honestly, code is cheap. If you're at 50-60% done, it's good enough to show the user. You don't know what happens until a real user touches it. Ship first, get rejected, improve, repeat.
 
 ## 3. Not Every Problem Needs a Quick Fix (And Not Every Small Thing Needs Deep Thinking)
 
 I've done both extremes.
 
-**The quick fix trap:** We were building the task management module, and there were bugs in the task spreadsheet. Column widths were off. I found what felt like a quick win — just remove the min and max width constraints. Problem solved, things looked right. Fast.
+We were building the task management module, and there were bugs in the task spreadsheet. Column widths were off. I found what felt like a quick win — just remove the min and max width constraints. Problem solved, things looked right. Fast. Until they didn't. Things started overlapping each other. My quick fix created a new problem because I didn't think about what those constraints were protecting.
 
-Until they didn't. Things started overlapping each other. My "quick fix" created a new problem because I didn't think about what those constraints were protecting.
+On the other side, I shipped a sections feature for projects. Spent way too much time on it. And ironically, the things that actually mattered — like making sections private or public — I skipped. I had them in mind, I knew they were necessary, but I got so deep into other parts that I missed what would actually make the user's life easier.
 
-**The overthinking trap:** I shipped a sections feature for projects. But I spent way too much time on it. And ironically, the things that actually mattered — like making sections private or public — I skipped. I had them in mind, I knew they were necessary, but I got so deep into other parts that I missed what would actually make the user's life easier.
-
-Sometimes we spend time on the wrong things and skip the right ones.
-
-The better approach:
-
-- Always ask — what's the **cost, time, and effort** vs. **actual benefit**?
-- Have the conversation multiple times — *"Is this really worth doing as a short-term fix, or should we invest in the long-term solution?"*
-- If the short-term fix takes more time and effort than building it properly in phases — it's a waste. Just do it right.
-- And before shipping — ask yourself: *"Did I build what looks good to me, or what makes the user's life easier?"*
+Sometimes we spend time on the wrong things and skip the right ones. The better way is to always ask — what's the cost and effort vs the actual benefit? And before shipping, ask yourself — did I build what looks good to me, or what makes the user's life easier?
 
 ## 4. Don't Get Emotionally Attached to Your Code
 
-This one hits hard.
+When I build something, I get deeply bound to it. It becomes my feature. And then when someone criticizes it or suggests changes, I feel hurt. Frustrated. Like they're criticizing me, not the code.
 
-When I build something, I get deeply bound to it. It becomes *"my"* feature. And then when someone criticizes it or suggests changes, I feel hurt. Frustrated. Like they're criticizing me, not the code.
+We were redesigning the onboarding flow. I got personally attached to my approach. Team members gave suggestions, and I didn't take them seriously. Not because the suggestions were bad — but because in my head, I'd already decided how it should look and feel. Looking back, that's not confidence. That's just being stubborn.
 
-**We were redesigning the onboarding flow.** I got personally attached to my approach. Team members gave suggestions, and I didn't take them seriously. Not because the suggestions were bad — but because in my head, I'd already decided how it should look and feel.
-
-Looking back, that's not confidence. That's just being stubborn.
-
-**It's built for the end user, not for me.** Even if I did everything 100% right technically, if the client or the team doesn't feel good about it — it's not serving its purpose.
-
-I need to accept that and improve. Don't get attached to a feature or a product. Sometimes you're right, and things still don't go your way. That's just how building things works.
+It's built for the end user, not for me. Even if I did everything 100% right technically, if the client or the team doesn't feel good about it — it's not serving its purpose. Sometimes you're right, and things still don't go your way. That's just how building things works.
 
 ## 5. Overthinking Early Doesn't Mean Better Output
 
-I've spent way too much time thinking about perfection in the early stages of a feature. And then when stakeholders ask *"why are you behind the deadline?"* — I don't have a good answer.
+I've spent way too much time thinking about perfection in the early stages of a feature. And then when stakeholders ask why are you behind the deadline — I don't have a good answer.
 
-**I built an Activity Hub feature.** I spent an entire month on it. I went deep — finding every edge case, handling every aspect, building every possible scenario. And by the end of it, yes it was functional. It was usable. But the UX had a lot of problems, it didn't look good, and I'd burned a full month on something that should have shipped in phases.
+I built an Activity Hub feature. I spent an entire month on it. I went deep — finding every edge case, handling every aspect, building every possible scenario. And by the end of it, yes it was functional. It was usable. But the UX had a lot of problems, it didn't look good, and I'd burned a full month on something that should have shipped in phases.
 
-I was building complex. The user wanted simple.
+I was building complex. The user wanted simple. Ship Phase 1, get feedback, then iterate. A month of building in isolation almost always produces something the user didn't ask for.
 
-What works better:
-
-- **Divide into phases.** Ship Phase 1. Get feedback. Then iterate.
-- Suggest the phased approach to stakeholders — it buys you time and gets real user input early.
-- A month of building in isolation almost always produces something the user didn't ask for.
-
-But watch out for the opposite trap too — I've also shipped features without thinking about the long term and missed things users genuinely needed.
-
-The balance is hard. Think enough to not miss critical things. Don't think so much that you never ship.
+But the opposite trap is also real — I've shipped features without thinking about the long term and missed things users genuinely needed. The balance is hard. Think enough to not miss critical things. Don't think so much that you never ship.
 
 ## 6. Not Feeling Confident? Ship Anyway.
 
-This is common and I want to normalize it.
-
-**When I first joined my current company, I genuinely didn't feel confident that I could ship features here.** The codebase was new, the product was different from what I'd worked on before, and every task felt bigger than it was. I kept thinking — *"Can I actually do this?"*
+When I first joined my current company, I genuinely didn't feel confident that I could ship features here. The codebase was new, the product was different from what I'd worked on before, and every task felt bigger than it was. I kept thinking — can I actually do this?
 
 But I did. One feature at a time. It happened.
 
-When you're building something and you don't know what the end user really wants, when you can't fully visualize the outcome — you feel unsure. That's okay.
-
-Ship it. You get real feedback, you implement it, you ship again. That's how it works. You ship, you learn, you ship again.
+When you're building something and you don't know what the end user really wants, when you can't fully visualize the outcome — you feel unsure. That's okay. Ship it. You get real feedback, you implement it, you ship again. That's how it works. You ship, you learn, you ship again.
 
 ## 7. Don't Take Feedback and Bugs Personally
 
 When the team reports bugs, or repeats the same feedback, or keeps pointing out issues — I sometimes take it personally. Like it's a judgment on me as an engineer.
 
-**This keeps happening.** With the Activity Hub, with the sections feature, with the feature I shipped last week — every time the team comes with suggestions, my first thought is *"but my approach is right."* I feel it in my gut. And I resist.
+This keeps happening. With the Activity Hub, with the sections feature, with the feature I shipped last week — every time the team comes with suggestions, my first thought is but my approach is right. I feel it in my gut. And I resist.
 
 Sometimes I am right. But I can't explain why clearly enough to the team. And if you can't explain why, maybe you haven't thought it through as well as you think.
 
@@ -136,7 +86,7 @@ Most of the friction isn't about the feedback itself — it's about when it come
 
 The other pattern I've noticed — I go too deep. I pick up a feature, then I start connecting it to other features in my head, and suddenly I'm building three things instead of one. And now I'm stuck, the team is waiting on me, and the thing I was actually supposed to ship is delayed.
 
-Simple rule I'm setting for myself: ship what's assigned. Everything else goes in a separate plan.
+Simple rule I'm setting for myself — ship what's assigned. Everything else goes in a separate plan.
 
 ---
 
