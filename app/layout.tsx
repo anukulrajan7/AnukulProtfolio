@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
@@ -43,11 +44,17 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
+        {/* Prevent FOUC: enable transitions only after first paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.add("theme-ready")))`,
+          }}
+        />
       </head>
-      <body className="max-w-2xl mx-auto px-5 py-10 md:py-16">
+      <body className="max-w-[672px] mx-auto px-6 py-12 md:py-24">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Nav />
-          <main className="mt-14">{children}</main>
+          <main className="mt-16 md:mt-20">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

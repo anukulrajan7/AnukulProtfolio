@@ -67,7 +67,7 @@ export default function Home() {
     .slice(0, 3);
 
   return (
-    <div className="space-y-20">
+    <div className="space-y-16">
       {/* Hero */}
       <section className="fade-in">
         <div className="flex items-start gap-5">
