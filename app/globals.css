@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+/* === Font Faces === */
+@font-face {
+  font-family: "Cabinet Grotesk";
+  src: url("/fonts/cabinet-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cabinet Grotesk";
+  src: url("/fonts/cabinet-extrabold.woff2") format("woff2");
+  font-weight: 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/satoshi-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* === CSS Custom Properties === */
+:root {
+  --font-heading: "Cabinet Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Satoshi", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --c-bg: #fafaf9;
+  --c-fg: #1a1a1a;
+  --c-muted: #6b6b6b;
+  --c-accent: #2563eb;
+  --c-surface: #f0efed;
+  --c-border: #e5e4e2;
+  --c-card: #ffffff;
+
+  color-scheme: light;
+}
+
+.dark {
+  --c-bg: #0c0c0c;
+  --c-fg: #ececec;
+  --c-muted: #999999;
+  --c-accent: #60a5fa;
+  --c-surface: #161616;
+  --c-border: #2a2a2a;
+  --c-card: #141414;
+
+  color-scheme: dark;
+}
+
+/* === Tailwind Theme Extension === */
+@theme {
+  --color-bg: var(--c-bg);
+  --color-fg: var(--c-fg);
+  --color-muted: var(--c-muted);
+  --color-accent: var(--c-accent);
+  --color-surface: var(--c-surface);
+  --color-border: var(--c-border);
+  --color-card: var(--c-card);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* === Base Styles === */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--c-bg);
+  color: var(--c-fg);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--c-accent);
+  color: white;
+}
+
+/* === Heading Font === */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+/* === Utility Classes === */
+.text-fg { color: var(--c-fg); }
+.text-muted { color: var(--c-muted); }
+.text-accent { color: var(--c-accent); }
+.bg-surface { background-color: var(--c-surface); }
+.bg-card { background-color: var(--c-card); }
+.border-border { border-color: var(--c-border); }
+
+.hover\:text-fg:hover { color: var(--c-fg); }
+.hover\:text-accent:hover { color: var(--c-accent); }
+.hover\:bg-surface:hover { background-color: var(--c-surface); }
+.hover\:border-accent\/40:hover { border-color: color-mix(in srgb, var(--c-accent) 40%, transparent); }
+
+/* === Fade In Animation === */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.4s ease both; }
+
+/* === Card === */
+.card {
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  background: var(--c-card);
+  padding: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  border-color: var(--c-accent);
+}
+
+.dark .card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* === Nav Link Underline === */
+.nav-link { position: relative; }
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: var(--c-accent);
+  transition: width 0.2s ease;
+}
+
+.nav-link:hover::after { width: 100%; }
+
+/* === Prose (Blog) === */
+.prose {
+  line-height: 1.8;
+  max-width: 65ch;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+}
+
+.prose h1 { font-size: 1.5rem; }
+.prose h2 { font-size: 1.25rem; }
+.prose h3 { font-size: 1.1rem; }
+.prose p { margin-bottom: 1.25em; }
+
+.prose a {
+  color: var(--c-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose a:hover { opacity: 0.8; }
+
+.prose ul, .prose ol {
+  padding-left: 1.5em;
+  margin-bottom: 1.25em;
+}
+
+.prose li { margin-bottom: 0.25em; }
+
+.prose blockquote {
+  border-left: 3px solid var(--c-border);
+  padding-left: 1em;
+  color: var(--c-muted);
+  font-style: italic;
+  margin: 1.5em 0;
+}
+
+.prose pre {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: 1em;
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  font-family: var(--font-mono);
+  margin: 1.5em 0;
+}
+
+.prose code { font-family: var(--font-mono); font-size: 0.875em; }
+
+.prose :not(pre) > code {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  padding: 0.15em 0.35em;
+}
+
+.prose img { border-radius: 8px; margin: 1.5em 0; }
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--c-border);
+  margin: 2em 0;
+}
+
+/* === Smooth theme transition === */
+* { transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease; }

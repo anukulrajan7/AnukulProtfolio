@@ -1,0 +1,71 @@
+---
+title: "Why I Stopped Using useEffect for Data Fetching"
+date: "2025-08-10"
+summary: "useEffect works but creates race conditions, loading state bugs, and unnecessary complexity. There are better patterns now."
+---
+
+Every React tutorial starts with this:
+
+```jsx
+useEffect(() => {
+  fetch('/api/data')
+    .then(res => res.json())
+    .then(setData);
+}, []);
+```
+
+It works. But it's a trap.
+
+## The problems
+
+**Race conditions.** If the dependency changes fast (search input, tab switches), multiple requests fire. The last response might not be from the last request.
+
+```jsx
+// Bug: typing "react" fires 5 requests
+// Response for "r" might arrive after "react"
+useEffect(() => {
+  fetch(`/api/search?q=${query}`)
+    .then(res => res.json())
+    .then(setResults);
+}, [query]);
+```
+
+**No cleanup.** You need an AbortController for cancellation. Most devs forget.
+
+**Loading and error states.** You end up with 3-4 state variables (`data`, `loading`, `error`, `isRefetching`) that are easy to get wrong.
+
+**Waterfalls.** Parent fetches, then renders children, then children fetch. Sequential when it could be parallel.
+
+## What I use instead
+
+**Server Components** (Next.js App Router). Data fetching happens on the server. No loading states. No race conditions. The component renders with data already available.
+
+```tsx
+// Just works. No useEffect, no loading state.
+export default async function Dashboard() {
+  const data = await fetchDashboardData();
+  return <DashboardView data={data} />;
+}
+```
+
+**React Query / SWR** for client-side cases where you genuinely need it (real-time updates, optimistic mutations). They handle caching, deduplication, and race conditions.
+
+```tsx
+function SearchResults({ query }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['search', query],
+    queryFn: () => fetchSearch(query),
+  });
+
+  if (isLoading) return <Skeleton />;
+  return <ResultList items={data} />;
+}
+```
+
+## When useEffect is still fine
+
+- Subscriptions (WebSocket, event listeners)
+- DOM manipulation (focus, scroll position)
+- Syncing external stores
+
+For data fetching? Almost never anymore.

@@ -1,0 +1,52 @@
+---
+title: "CORS Isn't Backend Security — And I Wish I Knew That Earlier"
+date: "2025-10-15"
+summary: "I thought CORS was some kind of backend validation. I was wrong. Here's what it actually is and why it fails."
+---
+
+For the longest time, I believed that CORS was some kind of backend validation — something that checked whether the server would "allow" my request or not.
+
+But I was wrong.
+
+## What CORS actually is
+
+CORS is a **browser-enforced** security mechanism. It protects **users**, not servers. The server doesn't block anything. The browser does.
+
+When your frontend at `localhost:5173` makes a request to `api.example.com`, the browser checks the response headers. If the server doesn't include `Access-Control-Allow-Origin` with your origin, the browser **refuses to show you the response**.
+
+The request still reaches the server. The server still processes it. The response comes back. But the browser throws it away.
+
+## The preflight trap
+
+For non-simple requests (custom headers, `PUT`/`DELETE` methods, JSON content type), the browser sends an `OPTIONS` request first. This is the preflight.
+
+```js
+// This triggers a preflight
+fetch('https://api.example.com/data', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ name: 'Anukul' })
+});
+```
+
+If the server doesn't handle `OPTIONS` correctly, your actual request never fires. You see a CORS error, but the real issue is the preflight response.
+
+## Why `*` doesn't always work
+
+Setting `Access-Control-Allow-Origin: *` seems like a fix, but it breaks when you need credentials (cookies, auth headers). The browser requires a specific origin when credentials are involved.
+
+```js
+// This won't work with Access-Control-Allow-Origin: *
+fetch('https://api.example.com/data', {
+  credentials: 'include'
+});
+```
+
+## What I do now
+
+1. Set specific origins in development and production
+2. Handle `OPTIONS` preflight on every endpoint
+3. Never assume CORS is "security" — it's access control for browsers
+4. Test API calls with `curl` first to isolate browser vs server issues
+
+The key insight: if `curl` works but the browser doesn't, it's CORS. If `curl` also fails, it's your server.

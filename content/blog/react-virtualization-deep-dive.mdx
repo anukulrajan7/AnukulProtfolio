@@ -1,0 +1,85 @@
+---
+title: "React Virtualization — What Actually Happens Under the Hood"
+date: "2025-09-20"
+summary: "Virtualizing the DOM isn't enough. If your JSX still maps all items, React does all the work anyway."
+---
+
+Working on a task management UI at Wokay, I had to render 1000+ interactive rows in a spreadsheet-like layout. Scroll performance was terrible. So I reached for virtualization.
+
+## The basic idea
+
+Virtualization means only rendering what's visible. You calculate the visible portion of the screen using scroll offset, item size, and viewport height. Then you render just those items.
+
+Think of it like a stage — only the actors in the spotlight are on stage. Everyone else is backstage.
+
+```jsx
+// Simplified concept
+function VirtualList({ items, itemHeight, viewportHeight }) {
+  const [scrollTop, setScrollTop] = useState(0);
+
+  const startIndex = Math.floor(scrollTop / itemHeight);
+  const endIndex = Math.min(
+    startIndex + Math.ceil(viewportHeight / itemHeight) + 1,
+    items.length
+  );
+
+  const visibleItems = items.slice(startIndex, endIndex);
+
+  return (
+    <div
+      style={{ height: viewportHeight, overflow: 'auto' }}
+      onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
+    >
+      <div style={{ height: items.length * itemHeight }}>
+        {visibleItems.map((item, i) => (
+          <div
+            key={startIndex + i}
+            style={{
+              position: 'absolute',
+              top: (startIndex + i) * itemHeight,
+              height: itemHeight,
+            }}
+          >
+            {item.name}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+## The trap I fell into
+
+We chose `virtua` for our virtualization library. It's lightweight and has a great API. Scroll performance looked great at first.
+
+But here's the issue nobody warns you about:
+
+```jsx
+// This still creates JSX for ALL 1000 items
+<Virtualizer>
+  {tasks.map(task => <TaskRow task={task} />)}
+</Virtualizer>
+```
+
+React still builds the JSX for all 1000 items. It doesn't matter that virtua only renders 20 in the DOM. The component function runs for all of them.
+
+## The fix
+
+Only pass the visible items to the virtualizer, or restructure so the mapping happens inside the virtualization boundary:
+
+```jsx
+// Better: let the virtualizer control what gets mapped
+<VirtualList count={tasks.length}>
+  {(index) => <TaskRow task={tasks[index]} />}
+</VirtualList>
+```
+
+This way, the render function only runs for visible indices.
+
+## What I learned
+
+1. Virtualizing the DOM is not enough — you must also avoid unnecessary JSX creation
+2. `React.memo` helps but only if JSX isn't being rebuilt
+3. Move expensive logic outside render or defer it
+4. Profile with React DevTools Profiler, not just scroll smoothness
