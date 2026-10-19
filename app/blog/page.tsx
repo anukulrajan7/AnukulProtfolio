@@ -5,6 +5,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { formatLogDate } from "@/lib/format";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/blog" },
   title: "Writing",
   description: "Notes from building things: frontend, real-time systems, mistakes I keep making.",
 };

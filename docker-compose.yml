@@ -1,8 +1,12 @@
 services:
   portfolio:
     build: .
+    # Caddy on the host proxies anukulraj.com here; never expose publicly.
     ports:
-      - "3001:3000"
+      - "127.0.0.1:18100:3000"
     restart: unless-stopped
     environment:
       - NODE_ENV=production
+      # Set in /root/portfolio/.env on the VPS (not committed). Admin is off if unset.
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+      - ADMIN_SECRET=${ADMIN_SECRET:-}

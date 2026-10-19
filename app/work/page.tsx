@@ -5,6 +5,7 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { TagList } from "@/components/ui/tag";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/work" },
   title: "Work",
   description:
     "Roles so far: iMeet Technologies, Echo, Social X, Wokay. What I actually built at each.",

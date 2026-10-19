@@ -8,6 +8,7 @@ import { Frame } from "@/components/ui/frame";
 import { StatusTag } from "@/components/project-row";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/projects" },
   title: "Projects",
   description:
     "Field-log index of things I have built and run: Post Room, TalkToFriend, Device Tracker, eSSL ADMS Gateway, PaisaFlow, DriveEase, ai-dev-setup.",

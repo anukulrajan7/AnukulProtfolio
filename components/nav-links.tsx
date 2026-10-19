@@ -8,6 +8,7 @@ const links = [
   { href: "/projects", label: "Projects" },
   { href: "/blog", label: "Writing" },
   { href: "/arcade", label: "Arcade" },
+  { href: "/cv", label: "CV" },
 ];
 
 export function NavLinks() {
@@ -27,14 +28,6 @@ export function NavLinks() {
           </Link>
         );
       })}
-      <a
-        href="/resume.pdf"
-        target="_blank"
-        rel="noopener"
-        className="nav-link label py-1 hover:text-fg transition-colors"
-      >
-        Résumé
-      </a>
     </>
   );
 }

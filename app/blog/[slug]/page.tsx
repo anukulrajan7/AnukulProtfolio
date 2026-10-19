@@ -4,6 +4,8 @@ import type { Metadata } from "next";
 import { getBlogPost, getBlogPosts } from "@/lib/blog";
 import { MDXContent } from "@/components/mdx";
 import { formatLogDate, formatLongDate } from "@/lib/format";
+import { JsonLd } from "@/components/json-ld";
+import { site } from "@/lib/site-data";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -21,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.metadata.title,
     description: post.metadata.summary,
+    alternates: { canonical: `/blog/${slug}` },
     openGraph: {
       title: post.metadata.title,
       description: post.metadata.summary,
@@ -50,8 +53,22 @@ export default async function BlogPostPage({ params }: Props) {
   const next = index > 0 ? all[index - 1] : undefined;
   const prev = index < all.length - 1 ? all[index + 1] : undefined;
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.metadata.title,
+    description: post.metadata.summary,
+    datePublished: post.metadata.date,
+    url: `${site.url}/blog/${slug}`,
+    mainEntityOfPage: `${site.url}/blog/${slug}`,
+    author: { "@type": "Person", "@id": `${site.url}/#person`, name: site.name, url: site.url },
+    publisher: { "@type": "Person", "@id": `${site.url}/#person`, name: site.name },
+    inLanguage: "en",
+  };
+
   return (
     <div className="md:grid md:grid-cols-12 md:gap-8">
+      <JsonLd data={articleSchema} />
       <aside className="md:col-span-3">
         <div className="md:sticky md:top-8 flex flex-col gap-3 label">
           <Link href="/blog" className="hover:text-fg transition-colors w-fit">

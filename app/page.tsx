@@ -107,7 +107,7 @@ export default function Home() {
         <SectionLabel index="02" name="Projects" aside={<Link href="/projects" className="hover:text-fg transition-colors">all entries →</Link>} />
         <div className="mt-10 md:grid md:grid-cols-12 md:gap-8">
           <h2 className="display text-[2rem] md:text-[2.4rem] md:col-span-4 max-w-[14ch]">
-            Things that run while I <span className="italic">sleep</span>.
+            What I run <span className="italic">myself</span>, outside work.
           </h2>
           <ol className="mt-8 md:mt-0 md:col-span-8 border-t border-border">
             {selected.map((p, i) => (
@@ -146,11 +146,11 @@ export default function Home() {
         <Frame className="mt-10 grid md:grid-cols-12 gap-6 p-6 md:p-8">
           <div className="md:col-span-7">
             <h2 className="display text-[1.8rem] md:text-[2.2rem]">
-              A handheld in the <span className="italic">margins</span>.
+              Games. <span className="italic">Small</span> ones.
             </h2>
             <p className="mt-4 text-muted max-w-[52ch]">
-              Small games on a CRT-style panel, drawn in the same paper and ink as the rest of this
-              site. Built for breaks between log entries.
+              A few games on a CRT-style panel, same paper and ink as the rest of the site. For
+              breaks between entries.
             </p>
           </div>
           <div className="md:col-span-5 flex md:justify-end items-end">

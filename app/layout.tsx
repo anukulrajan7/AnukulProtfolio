@@ -2,25 +2,48 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { JsonLd } from "@/components/json-ld";
+import { site } from "@/lib/site-data";
 import { martianMono } from "./fonts";
 import "./globals.css";
 
 const description =
-  "Field log of Anukul Raj, Product Engineer at Wokay in Hyderabad. Real-time systems: live location tracking, WebRTC calling, device gateways, and the interfaces around them. Notes on frontend and systems work.";
+  "Anukul Raj is a product engineer in Hyderabad who builds real-time systems: live location tracking, WebRTC calling, device gateways, and the interfaces around them. Work, projects and notes.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://anukulraj.com"),
+  metadataBase: new URL(site.url),
   title: {
-    default: "Anukul Raj — Product Engineer",
+    default: "Anukul Raj — Product Engineer, Hyderabad",
     template: "%s | Anukul Raj",
   },
   description,
+  applicationName: "Anukul Raj",
+  authors: [{ name: "Anukul Raj", url: site.url }],
+  creator: "Anukul Raj",
+  keywords: [
+    "Anukul Raj",
+    "product engineer",
+    "frontend engineer",
+    "React",
+    "Next.js",
+    "TypeScript",
+    "React Native",
+    "Go",
+    "WebRTC",
+    "mediasoup",
+    "live location tracking",
+    "Hyderabad",
+  ],
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": `${site.url}/rss` },
+  },
   openGraph: {
     title: "Anukul Raj — Product Engineer",
     description,
-    url: "https://anukulraj.com",
+    url: site.url,
     siteName: "Anukul Raj",
-    locale: "en_US",
+    locale: "en_IN",
     type: "website",
   },
   twitter: {
@@ -29,10 +52,32 @@ export const metadata: Metadata = {
     description,
     creator: "@R01202183Raj",
   },
-  alternates: {
-    types: { "application/rss+xml": "https://anukulraj.com/rss" },
-  },
   robots: { index: true, follow: true },
+};
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": `${site.url}/#person`,
+  name: "Anukul Raj",
+  url: site.url,
+  image: `${site.url}/avatar.jpg`,
+  jobTitle: "Product Engineer 2",
+  worksFor: { "@type": "Organization", name: "Wokay", url: "https://wokay.com" },
+  address: { "@type": "PostalAddress", addressLocality: "Hyderabad", addressCountry: "IN" },
+  email: `mailto:${site.email}`,
+  sameAs: [site.github, site.linkedin, site.x],
+  knowsAbout: ["React", "Next.js", "TypeScript", "React Native", "Go", "WebRTC", "mediasoup", "live location tracking"],
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${site.url}/#website`,
+  url: site.url,
+  name: "Anukul Raj",
+  author: { "@id": `${site.url}/#person` },
+  inLanguage: "en",
 };
 
 export default function RootLayout({
@@ -49,6 +94,8 @@ export default function RootLayout({
             __html: `requestAnimationFrame(()=>requestAnimationFrame(()=>document.documentElement.classList.add("theme-ready")))`,
           }}
         />
+        <JsonLd data={personSchema} />
+        <JsonLd data={websiteSchema} />
       </head>
       <body className="min-h-screen flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>

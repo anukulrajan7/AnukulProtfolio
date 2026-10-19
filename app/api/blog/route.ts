@@ -81,6 +81,9 @@ export async function DELETE(req: NextRequest) {
   }
 
   const { slug } = await req.json();
+  if (typeof slug !== "string" || !/^[a-z0-9-]+$/.test(slug)) {
+    return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+  }
   const filePath = path.join(contentDir, `${slug}.mdx`);
 
   if (fs.existsSync(filePath)) {
