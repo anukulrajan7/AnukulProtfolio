@@ -81,7 +81,7 @@ export const roles: Role[] = [
   },
   {
     id: "socialx",
-    span: "Sep 2024 to Dec 2025",
+    span: "Oct to Dec 2024",
     company: "Social X",
     title: "Frontend Engineer",
     summary: "A social product's frontend, from nothing.",
@@ -94,7 +94,7 @@ export const roles: Role[] = [
   },
   {
     id: "wokay",
-    span: "Jan 2026 to now",
+    span: "Jan 2025 to now",
     company: "Wokay",
     title: "Product Engineer 2",
     url: "https://wokay.com",
@@ -303,8 +303,8 @@ export interface HistoryEntry {
 export const history: HistoryEntry[] = [
   { when: "Apr 2023", what: "iMeet Technologies, intern. Company site and edtech UI.", href: "/work#imeet" },
   { when: "Jul 2023", what: "Echo, intern. Data-viz dashboards.", href: "/work#echo" },
-  { when: "Sep 2024", what: "Social X. Frontend from the ground up.", href: "/work#socialx" },
-  { when: "Jan 2026", what: "Wokay, Product Engineer 2. Task and chat modules.", href: "/work#wokay" },
+  { when: "Oct 2024", what: "Social X. Frontend from the ground up.", href: "/work#socialx" },
+  { when: "Jan 2025", what: "Wokay, Product Engineer 2. Task and chat modules.", href: "/work#wokay" },
   { when: "Apr 2026", what: "ai-dev-setup. Claude Code setup, three profiles, 15 hooks.", href: "#ai-dev-setup" },
   { when: "Apr 2026", what: "TalkToFriend v0.1.0. WebRTC mesh plus mediasoup SFU.", href: "#talktofriend" },
   { when: "Jun 2026", what: "DriveEase. Tours and car-rental booking site, live on Vercel.", href: "#driveease" },

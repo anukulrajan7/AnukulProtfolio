@@ -48,7 +48,7 @@ export const roleExtras: Record<string, RoleExtra> = {
     color: 3,
     visual: "feed",
     chapter: "A product frontend from zero",
-    start: "Sep 2024",
+    start: "Oct 2024",
     teaser: "Frontend from zero",
     hardPart:
       "There was no codebase. Folder structure, data fetching, how a feed updates when someone you follow posts: every decision was mine. The hard part was real-time. New posts, likes and follows arrive while the user is scrolling, and the screen has to stay calm.",
@@ -58,7 +58,7 @@ export const roleExtras: Record<string, RoleExtra> = {
     color: 1,
     visual: "workspace",
     chapter: "Tasks, chat, notifications and a phone in a pocket",
-    start: "Jan 2026",
+    start: "Jan 2025",
     teaser: "Tasks, chat, notifications, live tracking",
     hardPart:
       "Everything here has a failure mode that only shows up on a real phone. A task list that must stay fast however long it gets. Drag-and-drop that must land in the right status every time. A notification that has to reach the right person once, not three times. Location tracking that must not drain the battery.",
@@ -108,8 +108,8 @@ const byId = Object.fromEntries(roleEntries.map((r) => [r.id, r]));
 export const timelineEvents: TimelineEvent[] = [
   { kind: "role", id: "imeet", date: "Apr 2023", role: byId.imeet },
   { kind: "role", id: "echo", date: "Jul 2023", role: byId.echo },
-  { kind: "role", id: "socialx", date: "Sep 2024", role: byId.socialx },
-  { kind: "role", id: "wokay", date: "Jan 2026", role: byId.wokay },
+  { kind: "role", id: "socialx", date: "Oct 2024", role: byId.socialx },
+  { kind: "role", id: "wokay", date: "Jan 2025", role: byId.wokay },
   {
     kind: "lane-start",
     id: "lane-side",
