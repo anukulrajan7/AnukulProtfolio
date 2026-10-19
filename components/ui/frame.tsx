@@ -2,33 +2,15 @@ import type { ComponentPropsWithoutRef, ElementType } from "react";
 
 type FrameProps<T extends ElementType> = {
   as?: T;
-  ticks?: boolean;
   className?: string;
 } & Omit<ComponentPropsWithoutRef<T>, "as" | "className">;
 
-export function Frame<T extends ElementType = "div">({
-  as,
-  ticks = true,
-  className = "",
-  children,
-  ...rest
-}: FrameProps<T>) {
+/** A card with a 2px ink border. The arcade cabinet and the CV sheet use it. */
+export function Frame<T extends ElementType = "div">({ as, className = "", children, ...rest }: FrameProps<T>) {
   const Tag = (as ?? "div") as ElementType;
   return (
-    <Tag className={`frame ${className}`} {...rest}>
-      {ticks ? <Ticks /> : undefined}
+    <Tag className={`card ${className}`} {...rest}>
       {children}
     </Tag>
-  );
-}
-
-export function Ticks() {
-  return (
-    <>
-      <span aria-hidden className="tick tick-tl" />
-      <span aria-hidden className="tick tick-tr" />
-      <span aria-hidden className="tick tick-bl" />
-      <span aria-hidden className="tick tick-br" />
-    </>
   );
 }

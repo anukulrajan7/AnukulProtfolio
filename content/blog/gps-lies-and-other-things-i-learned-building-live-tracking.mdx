@@ -1,103 +1,93 @@
 ---
-title: "GPS Lies, and Other Things I Learned Building Live Tracking"
+title: "GPS Lies, and Other Things Live Tracking Taught Me"
 date: "2026-10-14"
-summary: "I built a small location tracking lab from scratch — a Go backend, an Android app, a dashboard on a map. Most of what I learned was about not trusting the dots."
+summary: "Notes from working on live location tracking on real phones. Most of what I learned was about not trusting the dots."
 ---
 
-A few weeks back I wanted to properly understand how live location tracking works. Not the API-level understanding where you call a library and get a lat-long. The whole chain, phone to server to a line on a map.
+Lately I have been spending a lot of time around live location tracking. Not the API-level view where you call a library and get a lat-long, but the whole chain, phone to server to a line on a map. These are the lessons that stuck, written down in plain words so I do not forget them.
 
-So I built a lab. A Go backend that accepts events from phones, a small Android app in Kotlin that tracks my own movement, and a read-only dashboard that draws it on a map. It runs on my phone and a couple of phones I borrowed.
-
-The first thing I learned is that a phone does not know where it is. It has a guess, and a number telling you how bad the guess is.
+The first one is that a phone does not know where it is. It has a guess, and a number telling you how bad the guess is.
 
 ## A GPS point is a circle, not a dot
 
-Every fix the phone gives you has lat, lon, a timestamp, maybe a speed, and a thing called horizontal accuracy. That accuracy number is a radius. On Android it is a 68 percent confidence radius, meaning the real position is inside that circle about two times out of three. Not always. Two out of three.
+Every fix the phone gives you has a latitude, a longitude, a timestamp, maybe a speed, and something called horizontal accuracy. That accuracy number is a radius. On Android it is a confidence radius, meaning the real position is inside that circle roughly two times out of three. Not always. Two out of three.
 
-Indoors, or between tall buildings, the phone quietly stops using satellites and falls back to Wi-Fi or cell towers. You can spot these fixes easily because the accuracy comes out as exactly 100, 200, 300 or 500 metres, and the coordinate is often the same one repeated ten times in a row. On one test day somewhere between a fifth and a third of a phone's fixes were worse than 25 metres.
+Indoors, or between tall buildings, the phone quietly stops leaning on satellites and falls back to Wi-Fi or cell towers. Those fixes are easy to spot because the accuracy comes out as a suspiciously round number and the same coordinate often repeats several times in a row. A decent share of fixes on a normal day will simply be poor.
 
-Then there is Doze mode. When the phone sleeps, Android can throttle you to one fix every fifteen minutes. My first version had a rule that said a silence longer than a few minutes means the person went somewhere new. One night at home became fourteen separate "stays" at the same address, split apart by nothing but battery saving.
+Background limits make it worse. When the phone sleeps, Android can throttle how often your app gets a location. If your logic treats a long silence as proof that someone went somewhere new, battery saving alone can invent movement that never happened.
 
-The rule I ended up with is simple. Store every fix. Draw only the ones with accuracy of 25 metres or better. Everything else is counted and hidden behind a toggle on the dashboard that says something like "24 imprecise locations not shown". The filtering happens at display time, never at write time. The raw data is the truth and I do not touch it.
+The habit I settled on is to store every fix and decide what to draw later. Imprecise points can be counted and hidden behind a toggle, something like "a few imprecise locations not shown". Filtering belongs at display time, not at write time. The raw data is the truth and I do not touch it.
 
 ## Sampling by how the phone is moving
 
-My first instinct was a fixed interval. Every ten seconds, take a fix, done. That kills the battery when the phone is sitting on a desk for six hours, and it is still too slow to show a turn when you are in an auto doing forty.
+The first instinct is a fixed interval. Take a fix every ten seconds, done. That drains the battery when the phone sits on a desk for hours, and it is still too slow to show a turn when you are in a vehicle.
 
-What worked better was picking the interval based on a motion state. Still, walking, in a vehicle, and a fourth state for when someone is actually watching the live map. Still means a fix every couple of minutes with a fifty metre minimum distance. Walking is every ten seconds or so. Vehicle is faster. Watched is faster still. When battery drops under fifteen percent, drop one level.
+What works better is choosing the interval from a motion state. Still, walking, in a vehicle, and maybe one more for when someone is actively watching the live map. Still means rare fixes with a minimum distance. Walking is more frequent. Vehicle is more frequent again. Low battery should drop you one level.
 
-The part that took a while to get right was the switching. If you move states both ways instantly, a red light turns your vehicle state into still, then back to vehicle, then still again. So the move up to a more active state is immediate, because you do not want to miss the start of a drive. The move down only happens after two signals agree, or after about a minute of nothing changing.
+The part that takes care is the switching. If you change state instantly in both directions, a red light turns a vehicle into still, then back to vehicle, then still again. So the move up to a more active state is immediate, because you do not want to miss the start of a drive. The move down waits until the signal has held steady for a while. That small delay is hysteresis, and it removes most of the flicker.
 
 ```ts
 function nextState(current: State, signal: State, stableForMs: number): State {
   if (rank(signal) > rank(current)) return signal;
-  if (rank(signal) < rank(current) && stableForMs >= 60_000) return signal;
+  if (rank(signal) < rank(current) && stableForMs >= COOL_DOWN_MS) return signal;
   return current;
 }
 ```
 
-The signal itself comes from the OS activity recognition API combined with plain speed thresholds from the fixes. I tried once to do this with separate alarms and geofences all independently nudging the GPS. It became impossible to reason about. One small state machine that gates GPS is much easier to debug.
+The signal can come from the OS activity recognition API combined with plain speed from the fixes. I would rather have one small state machine gating the GPS than several alarms and geofences each nudging it on their own. The first is easy to debug and the second is not.
 
 ## Android does not want your service alive
 
 This is the boring, painful part nobody writes about enough.
 
-To keep tracking in the background on Android you need a foreground service with a visible notification. The user sees it all day. There is no way around that and honestly there should not be.
+To keep tracking in the background on Android you generally need a foreground service with a visible notification. The user sees it all day. There is no way around that and honestly there should not be.
 
-Then you need a boot receiver so tracking restarts after a reboot. You need a stall check, because the service can be alive and the location callback can just stop firing. You need to tell the user to set battery usage to unrestricted, and on a lot of phones sold in India, to turn on autostart in the manufacturer's own settings, which lives in a different place on every brand.
+Then you need to survive a reboot. You need to notice when the service is alive but the location callback has stopped firing. You need to guide the user toward unrestricted battery usage, and on many phones sold in India, toward the manufacturer's own autostart setting, which lives in a different place on every brand.
 
-And one thing that bit me. Background location permission can be declared in the manifest and still not be granted. The app has to handle both.
+And permissions have their own trap. Background location can be declared in the manifest and still not be granted, so the app has to handle both cases honestly.
 
 ## Write to disk first, upload later
 
-Early on I had the app upload a fix as soon as it got one. Then I walked through a basement parking and lost twenty minutes of data.
+It is tempting to upload a fix the moment you get it. Then someone walks through a basement parking lot and a chunk of the trip is gone.
 
-Now every event goes into SQLite on the phone first. Upload is a separate job that reads from that table in batches. The batch cadence follows the same motion state, every five minutes when still, every thirty seconds in a vehicle, every few seconds when watched.
+The safer shape is to write every event to local storage on the phone first. Upload is a separate job that reads from that storage in batches. If an upload fails, back off exponentially and honour Retry-After if the server sends it. The network must never decide whether a point gets recorded. Record always, sync whenever.
 
-If the upload fails, back off exponentially and honour the Retry-After header if the server sends one. The network must never decide whether a point gets recorded. Record always, sync whenever.
+## Make ingest safe to retry
 
-## One bad event must not block the queue
-
-On the server, ingest is idempotent by event id. The client generates a UUID per event and the insert is an ON CONFLICT DO NOTHING. If the phone retries a batch, the server says acked and nothing doubles.
+Retries are guaranteed on mobile networks, so the server has to be idempotent. The client generates an id per event, and inserting the same id twice does nothing. If the phone resends a batch, the server acknowledges it and nothing doubles.
 
 ```sql
-insert into events (event_id, device_id, sequence, recorded_at, received_at, payload)
-values (?, ?, ?, ?, ?, ?)
+insert into events (event_id, device_id, recorded_at, received_at, payload)
+values (?, ?, ?, ?, ?)
 on conflict (event_id) do nothing;
 ```
 
-Ordering is by a per-install sequence number, not the device clock. Device clocks are wrong more often than you would think. I store both recordedAt from the phone and receivedAt from the server and never overwrite either.
+Device clocks are wrong more often than you would think, so I keep both recordedAt from the phone and receivedAt from the server and never overwrite either. Ordering by the phone's clock alone is asking for trouble.
 
-The mistake that taught me the most was treating a batch as all or nothing. One event had a number sent as a float where my decoder expected an int. The whole batch got a 400. The client marked it pending and retried the same oldest rows. Forever. The device's whole upload queue was wedged behind one bad row.
-
-Now each event in a batch is validated on its own. Good ones get inserted in one transaction. Bad ones go into a rejected_events table with a reason, and the response has both an acked list and a rejected list. Nothing is silently dropped, it is just kept somewhere else as evidence.
+I also learned not to treat a batch as all or nothing. If one malformed event fails the whole request and the client keeps retrying the same rows, a single bad row can block everything behind it. Judging each event on its own, and telling the client clearly which ones were accepted and which were not, keeps the queue moving.
 
 ## Saying "I don't know"
 
-Someone's phone was reporting fine at two in the afternoon. Then nothing for forty minutes. Then it is back, six kilometres away. What should the dashboard draw in between?
+Picture a phone reporting fine in the afternoon, then nothing for forty minutes, then it is back several kilometres away. What should the map draw in between?
 
-The tempting answer is a straight line from A to B. I did that first. It looks exactly as confident whether the gap was two minutes or two hours, and whether the person drove, walked, or the phone was simply switched off.
+The tempting answer is a straight line from A to B. It looks exactly as confident whether the gap was two minutes or two hours, and whether the person drove, walked, or the phone was simply switched off.
 
-So now the server only names a cause when an event proves it. A tracking-stopped event, a new boot id on return, a heartbeat that says tracking is off. Those are facts. Everything else is labelled as inference and the UI never hides that label. If nothing arrived and I have no evidence, the dashboard says unknown.
+A better rule is to name a cause only when the data proves it, for example an explicit tracking-stopped event or a restart marker. Everything else is inference and should be labelled that way. If nothing arrived and there is no evidence, the honest label is unknown.
 
-For the line itself, I check whether the distance is plausible for the time elapsed. Walking distance gets a dotted straight line marked "no readings". Vehicle-plausible distance gets a route from a routing engine, drawn lighter and marked "likely route". Impossible speed gets no line at all and a flag saying the device jumped.
+For the line itself, it helps to check whether the distance is plausible for the time elapsed. A walkable distance can get a dotted line marked as having no readings. A distance only a vehicle could cover can get a lighter route marked as likely. An impossible speed should get no line at all, just a flag.
 
-A wrong line that looks confident is worse than an honest gap. I wrote that in the spec and I keep coming back to it.
+A wrong line that looks confident is worse than an honest gap. I keep coming back to that.
 
 ## Cleaning the path
 
-The accuracy filter removes most of the garbage, but not all of it. A few more checks run in a fixed order, and again none of them delete anything, they only decide what to draw.
+The accuracy filter removes most of the garbage, but not all of it. A few more checks help, and again none of them should delete anything. They only decide what to draw.
 
-Repeat fixes with the same timestamp get skipped. Then an implied speed check, with a twist. The distance between two fixes is reduced by both their accuracy radii before dividing by time. A phone on a desk can report two points twenty metres apart purely from noise. If you do not subtract the accuracy, that becomes fake kilometres by the end of the day.
+Skip repeated fixes that share a timestamp. Check implied speed, but reduce the distance between two fixes by their accuracy radii before dividing by time. A phone on a desk can report two points apart purely from noise, and without that adjustment the noise adds up to fake kilometres by the end of the day. Look for spikes that jump far away and snap straight back. Watch for slow drift while the phone's own motion sensor says it has not moved.
 
-Then a spike check for points that go far away and snap straight back. Then a still-drift rule for when the phone wanders forty metres from its true spot while its own speed sensor says it has not moved.
+I tried a Kalman filter. It barely changed the results and did not fix the case that mattered, where one confident-looking bad reading pulls the line far off course. The smooth live pin people like on maps is usually animation between sparse pings, not denser GPS.
 
-I tried a Kalman filter. On real data it barely changed anything and did not fix the one case that mattered, where a single confident-looking bad reading pulled the line off by four hundred metres. So I left it out. The smooth live pin people like on maps is client-side animation between sparse pings, not denser GPS.
+## Where the cost goes
 
-## Where the money goes
+Storage is cheap. The real spend in a system like this tends to be maps, routing and road-snapping services billed per call. So snap only completed segments, sample less when still, cache lookups, and only do the expensive work for something a human is actually looking at.
 
-I will not put real numbers here, but the shape of the cost surprised me. Storage is nothing. The spend is almost entirely in maps, routing and road-snapping APIs, billed per call.
-
-The levers follow from that. Self-host a routing engine on OpenStreetMap data. Snap only completed move segments, not every point as it arrives. Sample less when still. Cache geocodes. Only snap or route something when a human is actually looking at it. Keep any paid fallback behind an explicit switch. And work out the worst-case cost per device per month assuming no free tier at all, before committing to anything.
-
-I am still running the lab on my own phone. Most days the map is right. Some days it tells me I was at home when I was at the tea stall down the road, and I have learnt to be okay with the dashboard saying "accurate to about 18 metres" instead of pretending it knows.
+Most days the map is right. Some days it says I was at home when I was at the tea stall down the road, and I have learnt to be okay with a screen saying "accurate to about 20 metres" instead of pretending it knows.

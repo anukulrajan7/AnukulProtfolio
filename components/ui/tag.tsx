@@ -7,15 +7,15 @@ interface TagProps {
 }
 
 const tones = {
-  route: "text-route border-route/40",
-  muted: "text-muted border-border",
-  accent: "text-accent-text border-accent/50",
+  route: "text-fg bg-surface",
+  muted: "text-muted bg-surface",
+  accent: "text-on-accent bg-accent",
 };
 
-export function Tag({ children, tone = "route", className = "" }: TagProps) {
+export function Tag({ children, tone = "muted", className = "" }: TagProps) {
   return (
     <span
-      className={`inline-flex items-center font-mono text-[10.5px] uppercase tracking-[0.06em] leading-none px-1.5 py-[5px] border ${tones[tone]} ${className}`}
+      className={`inline-flex items-center text-[13px] font-medium leading-none px-2.5 py-[6px] rounded-full ${tones[tone]} ${className}`}
     >
       {children}
     </span>
@@ -32,4 +32,9 @@ export function TagList({ items, tone }: { items: readonly string[]; tone?: TagP
       ))}
     </span>
   );
+}
+
+/** Plain-text stack line: "Go · SQLite · Docker". */
+export function StackLine({ items, className = "" }: { items: readonly string[]; className?: string }) {
+  return <p className={`text-[15px] text-muted ${className}`}>{items.join(" · ")}</p>;
 }

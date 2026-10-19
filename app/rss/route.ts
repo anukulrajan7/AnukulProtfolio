@@ -4,7 +4,7 @@ import { getBlogPosts } from "@/lib/blog";
 export async function GET() {
   const feed = new RSS({
     title: "Anukul Raj",
-    description: "Field notes from Anukul Raj — real-time systems, live location tracking, WebRTC, device gateways and frontend engineering.",
+    description: "Notes from Anukul Raj on real-time systems, live location tracking, WebRTC, device gateways and frontend engineering.",
     site_url: "https://anukulraj.com",
     feed_url: "https://anukulraj.com/rss",
     language: "en",

@@ -4,16 +4,16 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { JsonLd } from "@/components/json-ld";
 import { site } from "@/lib/site-data";
-import { martianMono } from "./fonts";
+import { bricolage, kalam, martianMono } from "./fonts";
 import "./globals.css";
 
 const description =
-  "Anukul Raj is a product engineer in Hyderabad who builds real-time systems: live location tracking, WebRTC calling, device gateways, and the interfaces around them. Work, projects and notes.";
+  "Anukul Raj is a product engineer in Hyderabad. Video calls, live location tracking, device gateways, and the interfaces around them. Work, projects and notes.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "Anukul Raj — Product Engineer, Hyderabad",
+    default: "Anukul Raj, Product Engineer in Hyderabad",
     template: "%s | Anukul Raj",
   },
   description,
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     types: { "application/rss+xml": `${site.url}/rss` },
   },
   openGraph: {
-    title: "Anukul Raj — Product Engineer",
+    title: "Anukul Raj, Product Engineer",
     description,
     url: site.url,
     siteName: "Anukul Raj",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Anukul Raj — Product Engineer",
+    title: "Anukul Raj, Product Engineer",
     description,
     creator: "@R01202183Raj",
   },
@@ -61,7 +61,7 @@ const personSchema = {
   "@id": `${site.url}/#person`,
   name: "Anukul Raj",
   url: site.url,
-  image: `${site.url}/avatar.jpg`,
+  image: `${site.url}${site.photo}`,
   jobTitle: "Product Engineer 2",
   worksFor: { "@type": "Organization", name: "Wokay", url: "https://wokay.com" },
   address: { "@type": "PostalAddress", addressLocality: "Hyderabad", addressCountry: "IN" },
@@ -86,7 +86,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={martianMono.variable}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${bricolage.variable} ${kalam.variable} ${martianMono.variable}`}
+    >
       <head>
         {/* Prevent FOUC: enable transitions only after first paint */}
         <script
@@ -100,7 +104,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Nav />
-          <main className="flex-1 mx-auto w-full max-w-[1120px] px-5 md:px-8 pt-10 md:pt-16">{children}</main>
+          <main className="flex-1 mx-auto w-full max-w-[1200px] px-5 md:px-8 pt-8 md:pt-12">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

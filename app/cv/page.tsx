@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import { projects, roles, site, skills } from "@/lib/site-data";
 import { PrintButton } from "@/components/print-button";
-import { Ticks } from "@/components/ui/frame";
 
 export const metadata: Metadata = {
   title: "CV",
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const cvProjectIds = ["device-tracker", "post-room", "talktofriend", "essl-adms-gateway"];
+const cvProjectIds = ["post-room", "talktofriend", "essl-adms-gateway", "paisaflow"];
 
 export default function CvPage() {
   const picked = cvProjectIds
@@ -22,23 +21,23 @@ export default function CvPage() {
   return (
     <div>
       <div className="print:hidden flex flex-wrap items-center justify-between gap-4 mb-8">
-        <p className="label">
-          One page. Prints to A4. The <a href="/resume.pdf" className="text-fg hover:text-accent transition-colors">older PDF</a> is still there.
+        <p className="text-[15px] text-muted">
+          One page. Prints to A4. The{" "}
+          <a href="/resume.pdf" className="text-accent-text font-medium underline decoration-2 underline-offset-4 hover:text-fg transition-colors">
+            older PDF
+          </a>{" "}
+          is still there.
         </p>
         <PrintButton />
       </div>
 
-      <article className="cv frame mx-auto bg-card text-fg">
-        <Ticks />
-
-        <header className="cv-grid border-b border-border pb-5">
+      <article className="cv card mx-auto bg-card text-fg">
+        <header className="cv-grid border-b-2 border-fg pb-5">
           <div>
-            <h1 className="display text-[2.4rem] leading-none">
-              Anukul <span className="italic">Raj</span>
-            </h1>
+            <h1 className="display text-[2.4rem] leading-none">Anukul Raj</h1>
             <p className="mt-2 text-[15px]">Product Engineer · real-time web, mobile and the services behind them</p>
           </div>
-          <ul className="label text-fg flex flex-col gap-1 md:text-right">
+          <ul className="text-[13.5px] text-fg flex flex-col gap-1 md:text-right">
             <li>Hyderabad, India</li>
             <li>
               <a href={`mailto:${site.email}`} className="hover:text-accent">{site.email}</a>
@@ -56,18 +55,17 @@ export default function CvPage() {
         </header>
 
         <section className="cv-grid pt-5">
-          <h2 className="label text-fg">Summary</h2>
+          <h2 className="font-bold text-[15px]">Summary</h2>
           <p className="text-[14.5px] leading-relaxed">
             Three years building products people use all day. At Wokay I own the task and chat modules of a
-            real-time workspace, built audio/video calling on a mediasoup SFU, and shipped motion-aware
-            background location tracking in React Native. After hours I write Go and Rust: a location-tracking
-            ingest with a tested spec, a biometric device gateway, an inbox agent that drafts but never sends
-            on its own.
+            real-time workspace, built the structure behind notifications, and now work on the geo module: live
+            location tracking in React Native. After hours I write Go and Rust: a biometric device
+            gateway, an inbox agent that drafts but never sends on its own.
           </p>
         </section>
 
         <section className="cv-grid pt-5">
-          <h2 className="label text-fg">Experience</h2>
+          <h2 className="font-bold text-[15px]">Experience</h2>
           <ol className="space-y-4">
             {timeline.map((r) => (
               <li key={r.id}>
@@ -75,12 +73,11 @@ export default function CvPage() {
                   <h3 className="font-bold text-[15px]">
                     {r.title} <span className="font-normal text-muted">· {r.company}</span>
                   </h3>
-                  <span className="label tabular-nums">{r.span}</span>
+                  <span className="label">{r.span}</span>
                 </div>
-                <ul className="mt-1.5 space-y-1">
+                <ul className="mt-1.5 space-y-1 list-disc pl-4 marker:text-accent">
                   {r.points.slice(0, r.current ? 4 : 2).map((p) => (
-                    <li key={p} className="relative pl-4 text-[13.5px] leading-snug">
-                      <span aria-hidden className="absolute left-0 top-[0.7em] w-2 h-px bg-route" />
+                    <li key={p} className="text-[13.5px] leading-snug">
                       {p}
                     </li>
                   ))}
@@ -91,34 +88,40 @@ export default function CvPage() {
         </section>
 
         <section className="cv-grid pt-5">
-          <h2 className="label text-fg">Selected projects</h2>
+          <h2 className="font-bold text-[15px]">Selected projects</h2>
           <ul className="space-y-2.5">
             {picked.map((p) => (
               <li key={p.id} className="text-[13.5px] leading-snug">
                 <span className="font-bold">{p.name}</span>
-                <span className="text-muted"> · {p.year} · {p.status}</span>
+                <span className="text-muted"> · {p.year} · {p.status === "active" ? "building" : p.status}</span>
                 {p.links?.[0] ? (
-                  <a href={p.links[0].href} className="label ml-2 inline-flex items-center gap-0.5 hover:text-accent">
+                  <a href={p.links[0].href} className="ml-2 inline-flex items-center gap-0.5 text-accent-text hover:text-fg">
                     {p.links[0].href.replace("https://", "")}
                     <ArrowUpRight size={10} aria-hidden className="print:hidden" />
                   </a>
                 ) : undefined}
-                <div className="mt-0.5">{p.oneLine} {p.details[0]}</div>
+                <div className="mt-0.5">
+                  {p.oneLine} {p.details[0]}
+                </div>
               </li>
             ))}
           </ul>
         </section>
 
         <section className="cv-grid pt-5">
-          <h2 className="label text-fg">Stack</h2>
+          <h2 className="font-bold text-[15px]">Stack</h2>
           <p className="text-[13.5px] leading-relaxed">{skills.join(" · ")}</p>
         </section>
 
         <section className="cv-grid pt-5 pb-1">
-          <h2 className="label text-fg">Writing</h2>
+          <h2 className="font-bold text-[15px]">Writing</h2>
           <p className="text-[13.5px] leading-relaxed">
-            Notes on frontend and systems work at <a href={`${site.url}/blog`} className="underline decoration-accent hover:text-accent">anukulraj.com/blog</a> —
-            virtualization internals, CORS, data fetching without useEffect, mistakes I keep making.
+            Notes on frontend and systems work at{" "}
+            <a href={`${site.url}/blog`} className="text-accent-text underline decoration-2 underline-offset-2 hover:text-fg">
+              anukulraj.com/blog
+            </a>
+            : live location tracking, a fingerprint device protocol, long-list rendering in React, CORS, data
+            fetching without useEffect.
           </p>
         </section>
       </article>

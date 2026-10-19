@@ -1,10 +1,10 @@
 ---
 title: "Making a Fingerprint Machine Talk to My Server"
 date: "2026-10-17"
-summary: "An attendance terminal turned out to be a plain HTTP client that pushes tab-separated lines to whatever server you point it at. Here is what I learned getting one to talk to mine."
+summary: "A biometric terminal turned out to be a plain HTTP client that pushes tab-separated lines to whatever server you point it at. Here is what I learned getting one to talk to mine."
 ---
 
-I got my hands on a fingerprint attendance terminal recently. The small wall-mounted kind you see at office entrances, an eSSL unit from the ZKTeco family. I wanted to see if I could get its punches into my own database without the vendor software in between.
+I got my hands on a biometric terminal recently. The small wall-mounted kind you see at office entrances. I wanted to see if I could get its punches into my own database without the vendor software in between.
 
 My assumption going in was that I would have to connect to the device. Find its IP, open a socket, ask it for records. That is backwards. The device is the client. You give it a server address in its menu, under something like Comm and then Cloud Server — host, port, HTTP or HTTPS — and from then on it polls you and pushes to you. Your server never connects in. If you want the device to do something, you queue a command and wait for it to ask.
 
@@ -118,7 +118,7 @@ Duplicates were the other thing. When the device retries after an ErrorDelay, or
 
 ## Why I logged every request
 
-I kept a research file next to the code with every claim about the protocol labelled one of four ways. DOCUMENTED means I read it in the ZKTeco push protocol docs. OBSERVED ON DEVICE means I saw it in captured traffic, with the request id linked. ASSUMED means it is a guess I am using in code. UNKNOWN means I do not know yet.
+I kept a research file next to the code with every claim about the protocol labelled one of four ways. DOCUMENTED means I read it in the public push protocol docs. OBSERVED ON DEVICE means I saw it in captured traffic, with the request id linked. ASSUMED means it is a guess I am using in code. UNKNOWN means I do not know yet.
 
 This sounds like extra work. It was the opposite. Every time the device did something odd, I could look at the raw request, compare with what I had assumed, and update one line. Several things I had taken as fact from the docs moved to ASSUMED after a week of real traffic. The verify code mapping is still partly UNKNOWN.
 

@@ -1,0 +1,90 @@
+/* Project-tile visuals: animations run only on hover or when the tile is in view. */
+.viz-run {
+  animation-play-state: paused;
+}
+.tile:hover .viz-run,
+.tile[data-inview="true"] .viz-run {
+  animation-play-state: running;
+}
+@media (prefers-reduced-motion: reduce) {
+  .viz-run {
+    animation: none !important;
+  }
+}
+
+@keyframes viz-route-run {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  96% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes viz-tick {
+  0%,
+  12% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  22%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes viz-slide {
+  0% {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  18%,
+  85% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes viz-type {
+  0%,
+  10% {
+    opacity: 0;
+  }
+  12%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes viz-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 91, 56, 0.9);
+  }
+  60% {
+    box-shadow: 0 0 0 1.2cqw rgba(255, 91, 56, 0);
+  }
+}
+
+@keyframes viz-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}

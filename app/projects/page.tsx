@@ -1,119 +1,137 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Lock } from "lucide-react";
 import { history, projects } from "@/lib/site-data";
-import { SectionLabel } from "@/components/ui/section-label";
-import { TagList } from "@/components/ui/tag";
-import { Frame } from "@/components/ui/frame";
-import { StatusTag } from "@/components/project-row";
+import { SectionHeading } from "@/components/ui/section-label";
+import { StackLine } from "@/components/ui/tag";
+import { StatusPill } from "@/components/project-card";
+import { ProjectVisual } from "@/components/project-visual";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/projects" },
   title: "Projects",
   description:
-    "Field-log index of things I have built and run: Post Room, TalkToFriend, Device Tracker, eSSL ADMS Gateway, PaisaFlow, DriveEase, ai-dev-setup.",
+    "Things I have built and run: Post Room, TalkToFriend, ADMS Device Gateway, PaisaFlow, DriveEase, ai-dev-setup.",
 };
+
+const dotColor = ["bg-p1", "bg-p2", "bg-p3", "bg-p4", "bg-p5", "bg-p6", "bg-p7"];
 
 export default function ProjectsPage() {
   return (
     <div>
-      <SectionLabel index="02" name="Projects" aside={`${projects.length} entries`} />
-
-      <div className="mt-8 md:grid md:grid-cols-12 md:gap-8">
-        <h1 className="display text-[2.6rem] md:text-[3.4rem] md:col-span-6">
-          Built, running, <span className="italic">logged</span>.
-        </h1>
-        <p className="mt-4 md:mt-2 text-muted max-w-[44ch] md:col-span-5 md:col-start-8">
-          Only things that work end to end. Private repos are described, not linked. Employer work is
-          not here; it is on the <Link href="/work" className="underline decoration-accent hover:text-accent transition-colors">route</Link>.
+      <div className="md:grid md:grid-cols-12 md:gap-8">
+        <div className="md:col-span-7">
+          <SectionHeading as="h1" size="lg" name="Things I've built" />
+        </div>
+        <p className="mt-4 md:mt-3 text-muted max-w-[44ch] md:col-span-5 text-[1.05rem]">
+          Only things that work end to end. Private repos are described, not linked. Day-job work is on the{" "}
+          <Link href="/work" className="text-accent-text font-medium underline decoration-2 underline-offset-4 hover:text-fg transition-colors">
+            work page
+          </Link>
+          .
         </p>
       </div>
 
       {/* Index */}
-      <ol className="mt-14 border-t border-border">
-        {projects.map((p, i) => (
+      <ol className="mt-12 border-t-2 border-fg">
+        {projects.map((p) => (
           <li key={p.id} className="border-b border-border">
-            <a href={`#${p.id}`} className="group grid grid-cols-[2.5rem_1fr_auto] md:grid-cols-12 gap-x-4 md:gap-x-8 py-3 items-baseline -mx-3 px-3 hover:bg-card transition-colors">
-              <span className="label tabular-nums md:col-span-1">{String(i + 1).padStart(2, "0")}</span>
-              <span className="md:col-span-5 text-fg group-hover:text-accent transition-colors">{p.name}</span>
-              <span className="hidden md:block md:col-span-4 text-sm text-muted truncate">{p.oneLine}</span>
-              <span className="label tabular-nums md:col-span-2 md:text-right">{p.year}</span>
+            <a
+              href={`#${p.id}`}
+              className="group grid grid-cols-[1.25rem_1fr_auto] md:grid-cols-12 gap-x-4 md:gap-x-8 py-3.5 items-center -mx-3 px-3 rounded-lg hover:bg-surface transition-colors"
+            >
+              <span aria-hidden className={`w-3.5 h-3.5 rounded-full border-2 border-fg ${dotColor[p.color - 1]} md:col-span-1`} />
+              <span className="md:col-span-4 font-bold text-fg group-hover:text-accent transition-colors">{p.name}</span>
+              <span className="hidden md:block md:col-span-5 text-[15px] text-muted truncate">{p.oneLine}</span>
+              <span className="label md:col-span-2 md:text-right">{p.year}</span>
             </a>
           </li>
         ))}
       </ol>
 
-      {/* Entries */}
-      <div className="mt-20 space-y-16 md:space-y-20">
-        {projects.map((p, i) => (
-          <article key={p.id} id={p.id} className="scroll-mt-10 md:grid md:grid-cols-12 md:gap-8">
-            <header className="md:col-span-4">
-              <div className="label flex items-center gap-3">
-                <span className="text-fg">{String(i + 1).padStart(2, "0")}</span>
-                <span className="rule w-6" aria-hidden />
-                <span className="tabular-nums">{p.year}</span>
+      {/* Case studies */}
+      <div className="mt-20 space-y-24 md:space-y-32">
+        {projects.map((p) => (
+          <article key={p.id} id={p.id} className="scroll-mt-10 md:grid md:grid-cols-12 md:gap-10">
+            <div className="md:col-span-7 space-y-6">
+              <ProjectVisual project={p} />
+              {p.visual === "talktofriend" ? <ProjectVisual project={p} variant="alt" /> : undefined}
+            </div>
+
+            <div className="md:col-span-5 mt-8 md:mt-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <h2 className="display-md text-[2rem] md:text-[2.3rem]">{p.name}</h2>
+                <StatusPill status={p.status} />
               </div>
-              <h2 className="display text-[2rem] md:text-[2.3rem] mt-4">{p.name}</h2>
-              <p className="mt-2 text-muted">{p.oneLine}</p>
-              <div className="mt-5 flex flex-wrap items-center gap-1.5">
-                <StatusTag status={p.status} />
-                <span className="label ml-1">{p.access === "public" ? "public repo" : "private repo"}</span>
-              </div>
+              <p className="mt-1.5 label">
+                {p.year} · {p.builtFor ? `built for ${p.builtFor}` : p.access === "public" ? "public repo" : "private repo"}
+              </p>
+              <p className="mt-4 text-[1.1rem] text-fg">{p.oneLine}</p>
+
+              <h3 className="mt-7 font-bold text-[1.05rem]">What it does</h3>
+              <p className="mt-2 text-[1rem] leading-relaxed text-fg">{p.what}</p>
+
+              {p.details.length > 0 ? (
+                <>
+                  <h3 className="mt-7 font-bold text-[1.05rem]">The hard part</h3>
+                  <ul className="mt-2 space-y-2.5 list-disc pl-5 marker:text-accent">
+                    {p.details.map((d) => (
+                      <li key={d} className="text-[15.5px] leading-relaxed">
+                        {d}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : undefined}
+
+              <h3 className="mt-7 font-bold text-[1.05rem]">Stack</h3>
+              <StackLine items={p.stack} className="mt-1.5" />
+
               {p.links && p.links.length > 0 ? (
-                <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
-                  {p.links.map((l) => (
+                <ul className="mt-6 flex flex-wrap gap-3">
+                  {p.links.map((l, i) => (
                     <li key={l.href}>
                       <a
                         href={l.href}
                         target="_blank"
                         rel="noopener"
-                        className="label text-fg inline-flex items-center gap-1 hover:text-accent transition-colors"
+                        className={`btn btn-sm ${i === 0 ? "btn-primary" : "btn-ghost"}`}
                       >
                         {l.label}
-                        <ArrowUpRight size={11} aria-hidden />
+                        <ArrowUpRight size={15} aria-hidden />
                       </a>
                     </li>
                   ))}
                 </ul>
-              ) : undefined}
-            </header>
-
-            <div className="md:col-span-8 mt-8 md:mt-0">
-              <p className="text-[1.0625rem] leading-relaxed max-w-[62ch]">{p.what}</p>
-              {p.details.length > 0 ? (
-                <Frame className="mt-6 p-5 md:p-6">
-                  <p className="label mb-4">notes</p>
-                  <ul className="space-y-3 max-w-[62ch]">
-                    {p.details.map((d) => (
-                      <li key={d} className="relative pl-5 text-[15px] leading-relaxed">
-                        <span aria-hidden className="absolute left-0 top-[0.8em] w-2.5 h-px bg-route" />
-                        {d}
-                      </li>
-                    ))}
-                  </ul>
-                </Frame>
-              ) : undefined}
-              <div className="mt-6">
-                <TagList items={p.stack} />
-              </div>
+              ) : (
+                <p className="mt-6 inline-flex items-center gap-2 rounded-full border-2 border-fg bg-surface px-4 py-2 text-[14px] font-medium">
+                  <Lock size={14} aria-hidden />
+                  {p.builtFor
+                    ? `Built for ${p.builtFor}, so the code stays theirs. Happy to talk through the approach.`
+                    : "Private repo. Happy to walk you through it."}
+                </p>
+              )}
             </div>
           </article>
         ))}
       </div>
 
-      {/* History strip */}
+      {/* History */}
       <section className="mt-28">
-        <SectionLabel index="02.1" name="Project history" aside="year.month → entry" />
-        <ol className="mt-8 border-t border-border">
+        <SectionHeading name="In order" aside="first commit or folder date" />
+        <ol className="mt-8 border-t-2 border-fg">
           {history.map((h, i) => (
-            <li key={`${h.when}-${i}`} className="grid grid-cols-[5.5rem_1fr] md:grid-cols-12 gap-x-4 md:gap-x-8 py-3 border-b border-border items-baseline">
-              <span className="label tabular-nums text-fg md:col-span-2">{h.when}</span>
+            <li
+              key={`${h.when}-${i}`}
+              className="grid grid-cols-[6.5rem_1fr] md:grid-cols-12 gap-x-4 md:gap-x-8 py-3 border-b border-border items-baseline"
+            >
+              <span className="label text-fg md:col-span-2">{h.when}</span>
               {h.href ? (
-                <Link href={h.href} className="md:col-span-10 text-[15px] hover:text-accent transition-colors">
+                <Link href={h.href} className="md:col-span-10 text-[15.5px] hover:text-accent transition-colors">
                   {h.what}
                 </Link>
               ) : (
-                <span className="md:col-span-10 text-[15px]">{h.what}</span>
+                <span className="md:col-span-10 text-[15.5px]">{h.what}</span>
               )}
             </li>
           ))}

@@ -53,9 +53,7 @@ function Img({ alt, ...props }: ComponentPropsWithoutRef<"img">) {
     <span className="block my-[1.8em]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img alt={alt} loading="lazy" {...props} />
-      <span className="block mt-[0.6em] font-mono text-[0.6875rem] tracking-[0.06em] uppercase text-muted">
-        {alt}
-      </span>
+      <span className="block mt-[0.6em] text-[0.875rem] font-medium text-muted">{alt}</span>
     </span>
   );
 }

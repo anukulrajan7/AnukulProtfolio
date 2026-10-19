@@ -1,14 +1,16 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getBlogPosts } from "@/lib/blog";
 import { projects, roles, selectedProjectIds, site } from "@/lib/site-data";
-import { formatLogDate } from "@/lib/format";
-import { ContourField } from "@/components/contour-field";
-import { SignalReadout } from "@/components/signal-readout";
-import { RouteTimeline } from "@/components/route-timeline";
-import { SectionLabel } from "@/components/ui/section-label";
-import { Frame } from "@/components/ui/frame";
-import { ProjectRow } from "@/components/project-row";
+import { formatLongDate } from "@/lib/format";
+import { HeroPhoto } from "@/components/hero-photo";
+import { ProofStrip } from "@/components/proof-strip";
+import { ProjectCard } from "@/components/project-card";
+import { WorkList } from "@/components/work-list";
+import { SectionHeading } from "@/components/ui/section-label";
+import { HandNote } from "@/components/hand-note";
+import { FindMe } from "@/components/find-me";
+
+const postBands = ["bg-p1", "bg-p2", "bg-p3", "bg-p4", "bg-p5", "bg-p6"];
 
 export default function Home() {
   const posts = getBlogPosts()
@@ -19,120 +21,153 @@ export default function Home() {
     .map((id) => projects.find((p) => p.id === id))
     .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
-  const routePreview = roles.map((r) => ({
-    id: r.id,
-    code: r.code,
-    span: r.span,
-    title: r.company,
-    subtitle: `${r.title} — ${r.summary}`,
-    current: r.current,
-  }));
-
   return (
     <div className="space-y-24 md:space-y-32">
       {/* Hero */}
-      <section className="relative -mx-5 md:-mx-8 px-5 md:px-8 pt-6 pb-10 md:pt-10 md:pb-16 overflow-hidden">
-        <ContourField
-          className="absolute inset-0 w-full h-full"
-          seed={17385}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse at 30% 40%, transparent 30%, var(--c-bg) 85%)",
-          }}
-        />
-
-        <div className="relative grid grid-cols-12 gap-x-6 gap-y-10">
-          <div className="col-span-12 lg:col-span-8">
-            <p className="label rise" style={{ "--i": 0 } as React.CSSProperties}>
-              §00 — field log · Hyderabad, IN
-            </p>
-            <h1
-              className="display mt-6 text-[3.4rem] sm:text-[4.6rem] md:text-[6rem] rise"
-              style={{ "--i": 1 } as React.CSSProperties}
-            >
-              Anukul <span className="italic">Raj</span>
-            </h1>
-            <p
-              className="mt-8 max-w-[34ch] text-[1.2rem] md:text-[1.45rem] leading-[1.4] rise"
-              style={{ "--i": 2 } as React.CSSProperties}
-            >
-              {site.heroLine}
-            </p>
-          </div>
-
-          <div className="col-span-12 sm:col-span-8 lg:col-span-4 lg:pt-10 rise" style={{ "--i": 3 } as React.CSSProperties}>
-            <SignalReadout status={site.status} />
-          </div>
-
-          <div
-            className="col-span-12 lg:col-span-8 flex items-start gap-4 pt-2 border-t border-border rise"
-            style={{ "--i": 4 } as React.CSSProperties}
+      <section className="grid grid-cols-12 gap-x-6 gap-y-12 md:gap-y-10 pt-2 md:pt-8">
+        <div className="col-span-12 md:col-span-7 order-2 md:order-1">
+          <HandNote className="rise text-accent-text" style={{ "--i": 0 } as React.CSSProperties} size="lg">
+            hi, I&apos;m Anukul
+          </HandNote>
+          <h1
+            className="display mt-3 text-[2.75rem] sm:text-[3.4rem] md:text-[clamp(3rem,5.1vw,4.75rem)] max-w-[15ch] rise"
+            style={{ "--i": 1 } as React.CSSProperties}
           >
-            <Image
-              src="/avatar.jpg"
-              alt="Anukul Raj"
-              width={44}
-              height={44}
-              className="shrink-0 mt-3 border border-border p-[2px] bg-card"
-              priority
-            />
-            <p className="mt-3 text-[15px] text-muted max-w-[60ch]">
-              <span className="label text-fg mr-3">now</span>
-              {site.now}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Work preview */}
-      <section id="work">
-        <SectionLabel index="01" name="Work" aside={<Link href="/work" className="hover:text-fg transition-colors">full route →</Link>} />
-        <div className="mt-10 md:grid md:grid-cols-12 md:gap-8">
-          <p className="md:col-span-4 text-muted max-w-[36ch]">
-            Four stops so far. Two internships, a startup frontend from zero, and a real-time workspace
-            where I now own tasks, chat and the calling and tracking features around them.
+            I build software that keeps working when the{" "}
+            <span className="highlight">network doesn&apos;t.</span>
+          </h1>
+          <p
+            className="mt-7 max-w-[46ch] text-[1.15rem] md:text-[1.25rem] leading-[1.5] text-muted rise"
+            style={{ "--i": 2 } as React.CSSProperties}
+          >
+            {site.heroSub}
           </p>
-          <div className="mt-10 md:mt-0 md:col-span-8">
-            <RouteTimeline waypoints={routePreview} dense />
+          <div className="mt-8 flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 rise" style={{ "--i": 3 } as React.CSSProperties}>
+            <Link href="/projects" className="btn btn-primary">
+              See what I&apos;ve built
+            </Link>
+            <a href={`mailto:${site.email}`} className="btn btn-ghost">
+              Email me
+            </a>
+            <a
+              href="/resume.pdf"
+              target="_blank"
+              rel="noopener"
+              className="text-[15px] font-medium text-muted underline decoration-2 decoration-border underline-offset-4 hover:text-fg hover:decoration-fg transition-colors sm:ml-2"
+            >
+              Résumé (PDF)
+            </a>
           </div>
+
+          <p className="mt-5 inline-flex items-center gap-2 text-[15px] font-medium text-fg rise" style={{ "--i": 4 } as React.CSSProperties}>
+            <span className="pill-dot" aria-hidden />
+            Open to opportunities
+          </p>
+
+          <div className="mt-8 max-w-[44ch] rise" style={{ "--i": 5 } as React.CSSProperties}>
+            <p className="sticky-note inline-block px-5 py-4 text-[15.5px] leading-snug">{site.now}</p>
+          </div>
+        </div>
+
+        <div className="col-span-12 md:col-span-5 order-1 md:order-2 md:pt-6 pb-16 md:pb-6">
+          <HeroPhoto className="md:ml-auto md:max-w-[360px]" />
         </div>
       </section>
 
-      {/* Selected projects */}
+      <ProofStrip className="mt-6" />
+
+      {/* Things I've built */}
       <section id="projects">
-        <SectionLabel index="02" name="Projects" aside={<Link href="/projects" className="hover:text-fg transition-colors">all entries →</Link>} />
-        <div className="mt-10 md:grid md:grid-cols-12 md:gap-8">
-          <h2 className="display text-[2rem] md:text-[2.4rem] md:col-span-4 max-w-[14ch]">
-            What I run <span className="italic">myself</span>, outside work.
-          </h2>
-          <ol className="mt-8 md:mt-0 md:col-span-8 border-t border-border">
-            {selected.map((p, i) => (
-              <ProjectRow key={p.id} project={p} index={i} />
-            ))}
-          </ol>
+        <SectionHeading
+          name="Things I've built"
+          aside={
+            <Link href="/projects" className="hover:text-fg transition-colors underline decoration-2 underline-offset-4">
+              All {projects.length} projects
+            </Link>
+          }
+        />
+        <p className="mt-3 text-muted max-w-[52ch]">
+          Side projects I run myself. Each one started with a question I couldn&apos;t answer from reading.
+        </p>
+        <ul className="mt-10 grid gap-x-8 gap-y-14 md:grid-cols-2">
+          {selected.map((p, i) => (
+            <ProjectCard key={p.id} project={p} featured={i === 0} />
+          ))}
+        </ul>
+      </section>
+
+      {/* About, in plain voice */}
+      <section id="about" className="md:grid md:grid-cols-12 md:gap-8">
+        <div className="md:col-span-5">
+          <SectionHeading name="A bit about me" />
         </div>
+        <div className="mt-6 md:mt-2 md:col-span-7 space-y-5 text-[1.1rem] leading-relaxed max-w-[58ch]">
+          <p>
+            I&apos;ve been paid to write software for about three years. Mostly React for the first two. In
+            the last year, more Go, Rust and Android than I planned for.
+          </p>
+          <p>
+            The work I like has a part that only shows up when things go wrong. A phone that lost signal. A
+            device that retries forever. An email that must not go out twice. I like being the person who
+            has already thought about that part.
+          </p>
+          <p>
+            At Wokay I own the task and chat modules of a real-time workspace, built the structure behind
+            notifications, and now work on the geo module: live location tracking in React Native. Evenings go to the
+            projects above.
+          </p>
+          <p className="text-muted">
+            I read every message.{" "}
+            <a href={`mailto:${site.email}`} className="text-accent-text font-medium underline decoration-2 underline-offset-4 hover:text-fg transition-colors">
+              {site.email}
+            </a>
+          </p>
+        </div>
+      </section>
+
+      {/* Where I've worked */}
+      <section id="work">
+        <SectionHeading
+          name="Where I've worked"
+          aside={
+            <Link href="/work" className="hover:text-fg transition-colors underline decoration-2 underline-offset-4">
+              The whole story
+            </Link>
+          }
+        />
+        <p className="mt-3 text-muted max-w-[52ch]">
+          Intern to product engineer in three and a half years. React UI first, then a product frontend from
+          zero, then chat, notifications and phones in pockets.
+        </p>
+        <WorkList roles={roles} className="mt-10" />
       </section>
 
       {/* Writing */}
       {posts.length > 0 ? (
         <section id="writing">
-          <SectionLabel index="03" name="Writing" aside={<Link href="/blog" className="hover:text-fg transition-colors">all entries →</Link>} />
-          <ul className="mt-10 grid gap-px md:grid-cols-3 bg-border border border-border">
-            {posts.map((post) => (
-              <li key={post.slug} className="bg-bg">
-                <Link href={`/blog/${post.slug}`} className="group block h-full p-6 hover:bg-card transition-colors">
-                  <time className="label tabular-nums" dateTime={post.metadata.date}>
-                    {formatLogDate(post.metadata.date)}
-                  </time>
-                  <h3 className="display text-[1.35rem] mt-4 group-hover:text-accent transition-colors">
-                    {post.metadata.title}
-                  </h3>
-                  <p className="mt-3 text-sm text-muted line-clamp-3">{post.metadata.summary}</p>
-                  <span className="label block mt-6">{post.metadata.readingTime}</span>
+          <SectionHeading
+            name="Writing"
+            aside={
+              <Link href="/blog" className="hover:text-fg transition-colors underline decoration-2 underline-offset-4">
+                All posts
+              </Link>
+            }
+          />
+          <ul className="mt-8 grid gap-6 md:grid-cols-3">
+            {posts.map((post, i) => (
+              <li key={post.slug} className="card overflow-hidden">
+                <Link href={`/blog/${post.slug}`} className="group block h-full">
+                  <span aria-hidden className={`block h-3 ${postBands[i % postBands.length]}`} />
+                  <div className="p-6">
+                    <time className="label" dateTime={post.metadata.date}>
+                      {formatLongDate(post.metadata.date)}
+                    </time>
+                    <h3 className="display-md text-[1.35rem] mt-3 group-hover:text-accent transition-colors">
+                      {post.metadata.title}
+                    </h3>
+                    <p className="mt-3 text-[15px] text-muted line-clamp-3">{post.metadata.summary}</p>
+                    <span className="label block mt-5">{post.metadata.readingTime}</span>
+                  </div>
                 </Link>
               </li>
             ))}
@@ -140,29 +175,26 @@ export default function Home() {
         </section>
       ) : undefined}
 
+      <FindMe />
+
       {/* Arcade teaser */}
       <section id="arcade">
-        <SectionLabel index="04" name="Arcade" />
-        <Frame className="mt-10 grid md:grid-cols-12 gap-6 p-6 md:p-8">
-          <div className="md:col-span-7">
-            <h2 className="display text-[1.8rem] md:text-[2.2rem]">
-              Games. <span className="italic">Small</span> ones.
-            </h2>
-            <p className="mt-4 text-muted max-w-[52ch]">
-              A few games on a CRT-style panel, same paper and ink as the rest of the site. For
-              breaks between entries.
+        <SectionHeading name="Games I made for fun" />
+        <div className="mt-8 rounded-[16px] border-2 border-fg bg-sun text-ink p-7 md:p-10 grid md:grid-cols-12 gap-6 items-center">
+          <div className="md:col-span-8">
+            <h3 className="display text-[2rem] md:text-[2.8rem]">Three small games. No libraries.</h3>
+            <p className="mt-4 text-[1.05rem] max-w-[52ch]">
+              A block stacker, a vector shooter and a snake that thinks it is a GPS trail. Plain TypeScript on a
+              canvas. High scores stay in your browser.
             </p>
           </div>
-          <div className="md:col-span-5 flex md:justify-end items-end">
-            <Link
-              href="/arcade"
-              className="inline-flex items-center gap-3 border border-fg px-4 h-11 label text-fg hover:bg-fg hover:text-bg transition-colors"
-            >
-              insert coin
+          <div className="md:col-span-4 flex md:justify-end">
+            <Link href="/arcade" className="btn btn-ghost !border-ink !text-ink hover:!bg-ink hover:!text-paper">
+              Play
               <span aria-hidden>→</span>
             </Link>
           </div>
-        </Frame>
+        </div>
       </section>
     </div>
   );

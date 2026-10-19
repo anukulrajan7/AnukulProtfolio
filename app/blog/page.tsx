@@ -1,14 +1,16 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getBlogPosts } from "@/lib/blog";
-import { SectionLabel } from "@/components/ui/section-label";
-import { formatLogDate } from "@/lib/format";
+import { SectionHeading } from "@/components/ui/section-label";
+import { formatLongDate } from "@/lib/format";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
   title: "Writing",
   description: "Notes from building things: frontend, real-time systems, mistakes I keep making.",
 };
+
+const bands = ["bg-p1", "bg-p2", "bg-p3", "bg-p4", "bg-p5", "bg-p6"];
 
 export default function BlogPage() {
   const posts = getBlogPosts().sort(
@@ -17,45 +19,43 @@ export default function BlogPage() {
 
   return (
     <div>
-      <SectionLabel index="03" name="Writing" aside={`${posts.length} entries`} />
-
-      <div className="mt-8 md:grid md:grid-cols-12 md:gap-8">
-        <h1 className="display text-[2.6rem] md:text-[3.4rem] md:col-span-5">
-          Notes, <span className="italic">mostly</span> about what went wrong.
-        </h1>
-        <p className="mt-4 md:mt-2 text-muted max-w-[46ch] md:col-span-6 md:col-start-7">
-          Short entries on frontend and systems work. Written in the order I learned them, not the order
-          that would look best.
+      <div className="md:grid md:grid-cols-12 md:gap-8">
+        <div className="md:col-span-7">
+          <SectionHeading as="h1" size="lg" name="Writing" />
+        </div>
+        <p className="mt-4 md:mt-3 text-muted max-w-[44ch] md:col-span-5 text-[1.05rem]">
+          Short notes on frontend and systems work, mostly about what went wrong. Written in the order I learned
+          them.
         </p>
       </div>
 
-      <ol className="mt-14 border-t border-border">
-        {posts.map((post) => (
-          <li key={post.slug} className="border-b border-border">
-            <Link
-              href={`/blog/${post.slug}`}
-              className="group grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-2 py-6 md:py-7 hover:bg-card transition-colors -mx-3 px-3"
-            >
-              <time className="label md:col-span-2 tabular-nums pt-[7px]" dateTime={post.metadata.date}>
-                {formatLogDate(post.metadata.date)}
-              </time>
-              <div className="md:col-span-8">
-                <h2 className="display text-[1.45rem] md:text-[1.6rem] group-hover:text-accent transition-colors">
+      <ul className="mt-12 grid gap-6 md:grid-cols-2">
+        {posts.map((post, i) => (
+          <li key={post.slug} className="card overflow-hidden">
+            <Link href={`/blog/${post.slug}`} className="group block h-full">
+              <span aria-hidden className={`block h-3 ${bands[i % bands.length]}`} />
+              <div className="p-6 md:p-7">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <time className="label" dateTime={post.metadata.date}>
+                    {formatLongDate(post.metadata.date)}
+                  </time>
+                  <span className="label">{post.metadata.readingTime}</span>
+                </div>
+                <h2 className="display-md text-[1.5rem] md:text-[1.7rem] mt-3 group-hover:text-accent transition-colors">
                   {post.metadata.title}
                 </h2>
-                <p className="mt-2 text-muted text-[15px] max-w-[62ch]">{post.metadata.summary}</p>
+                <p className="mt-3 text-[15.5px] text-muted max-w-[60ch]">{post.metadata.summary}</p>
               </div>
-              <span className="label md:col-span-2 md:text-right pt-[7px]">{post.metadata.readingTime}</span>
             </Link>
           </li>
         ))}
-      </ol>
+      </ul>
 
-      {posts.length === 0 ? <p className="text-muted mt-10">No entries yet.</p> : undefined}
+      {posts.length === 0 ? <p className="text-muted mt-10">Nothing here yet.</p> : undefined}
 
-      <p className="label mt-8">
-        <a href="/rss" className="hover:text-fg transition-colors">
-          rss feed →
+      <p className="mt-10 text-[15px]">
+        <a href="/rss" className="text-accent-text font-medium underline decoration-2 underline-offset-4 hover:text-fg transition-colors">
+          RSS feed
         </a>
       </p>
     </div>
