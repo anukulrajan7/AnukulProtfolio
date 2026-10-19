@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { martianMono } from "./fonts";
 import "./globals.css";
+
+const description =
+  "Field log of Anukul Raj, Product Engineer at Wokay in Hyderabad. Real-time systems: live location tracking, WebRTC calling, device gateways, and the interfaces around them. Notes on frontend and systems work.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://anukulraj.com"),
@@ -11,12 +14,10 @@ export const metadata: Metadata = {
     default: "Anukul Raj — Product Engineer",
     template: "%s | Anukul Raj",
   },
-  description:
-    "Product Engineer at Wokay. Building fast, accessible interfaces for real-time collaboration tools. 3 years of experience with React, Next.js, and TypeScript.",
+  description,
   openGraph: {
     title: "Anukul Raj — Product Engineer",
-    description:
-      "Product Engineer at Wokay. Building real-time collaboration tools.",
+    description,
     url: "https://anukulraj.com",
     siteName: "Anukul Raj",
     locale: "en_US",
@@ -25,9 +26,11 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Anukul Raj — Product Engineer",
-    description:
-      "Product Engineer at Wokay. Building real-time collaboration tools.",
+    description,
     creator: "@R01202183Raj",
+  },
+  alternates: {
+    types: { "application/rss+xml": "https://anukulraj.com/rss" },
   },
   robots: { index: true, follow: true },
 };
@@ -38,12 +41,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={martianMono.variable}>
       <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
         {/* Prevent FOUC: enable transitions only after first paint */}
         <script
           dangerouslySetInnerHTML={{
@@ -51,10 +50,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="max-w-[672px] mx-auto px-6 py-12 md:py-24">
+      <body className="min-h-screen flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Nav />
-          <main className="mt-16 md:mt-20">{children}</main>
+          <main className="flex-1 mx-auto w-full max-w-[1120px] px-5 md:px-8 pt-10 md:pt-16">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

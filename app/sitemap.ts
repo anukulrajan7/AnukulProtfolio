@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(post.metadata.date),
   }));
 
-  const routes = ["", "/blog", "/work", "/projects"].map((route) => ({
+  const routes = ["", "/blog", "/work", "/projects", "/arcade"].map((route) => ({
     url: `https://anukulraj.com${route}`,
     lastModified: new Date(),
   }));

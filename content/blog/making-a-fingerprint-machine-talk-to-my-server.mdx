@@ -1,0 +1,129 @@
+---
+title: "Making a Fingerprint Machine Talk to My Server"
+date: "2026-10-17"
+summary: "An attendance terminal turned out to be a plain HTTP client that pushes tab-separated lines to whatever server you point it at. Here is what I learned getting one to talk to mine."
+---
+
+I got my hands on a fingerprint attendance terminal recently. The small wall-mounted kind you see at office entrances, an eSSL unit from the ZKTeco family. I wanted to see if I could get its punches into my own database without the vendor software in between.
+
+My assumption going in was that I would have to connect to the device. Find its IP, open a socket, ask it for records. That is backwards. The device is the client. You give it a server address in its menu, under something like Comm and then Cloud Server — host, port, HTTP or HTTPS — and from then on it polls you and pushes to you. Your server never connects in. If you want the device to do something, you queue a command and wait for it to ask.
+
+Once that clicked, the rest was mostly listening carefully.
+
+## The handshake
+
+The first thing the device does after boot is a GET to a path like this.
+
+```
+GET /iclock/cdata?SN=SN-EXAMPLE-0001&options=all&pushver=2.4.1
+```
+
+It wants an options block back. Plain text, one key per line, starting with a line that echoes the serial.
+
+```
+GET OPTION FROM: SN-EXAMPLE-0001
+ATTLOGStamp=None
+OPERLOGStamp=None
+ErrorDelay=30
+Delay=10
+TransTimes=00:00;14:05
+TransInterval=1
+TransFlag=1111000000
+Realtime=1
+Encrypt=0
+```
+
+The stamps are the interesting part. They tell the device what you have already received. Send None and it may decide you have nothing and upload its entire stored history. Send a high value and it sends only what is newer. I did not fully trust the docs on this, so I tried both and watched what came in.
+
+Delay is how often it will poll you, in seconds. ErrorDelay is how long it waits before retrying when you answer with something it does not like. Remember that second one, it comes back later.
+
+After the options, the device settles into a loop. Every Delay seconds it sends a heartbeat.
+
+```
+GET /iclock/getrequest?SN=SN-EXAMPLE-0001&INFO=Ver6.60,12,10,340,192.168.1.50
+```
+
+The INFO field is a comma list — firmware version, user count, fingerprint count, attendance record count, the device's own IP, and a few more I never figured out. You reply OK, or you reply with a command. That is the whole channel for sending work to the device.
+
+## The attendance line
+
+When someone punches, the device POSTs to the same cdata path with a table parameter.
+
+```
+POST /iclock/cdata?SN=SN-EXAMPLE-0001&table=ATTLOG&Stamp=9999
+```
+
+The body is one punch per line, tab-separated. A made-up one looks like this, with the tabs shown.
+
+```
+1001\t2026-10-11 09:02:17\t0\t1\t0\t0\t0
+```
+
+PIN first — that is the user id on the device, not a password. Then the time. Then a status code for check-in or check-out, a verify mode code, a work code, and some reserved fields that were always zero for me. The docs hint that verify mode 1 is fingerprint, 15 is face, 2 is card, 0 is password. I did not take that as fact until I punched with each method and saw what arrived.
+
+You reply OK. Some documentation shows the reply as OK followed by a colon and the count of records accepted. I never saw a difference on my unit, so I made it a config toggle and moved on.
+
+## Reply exactly, or it retries forever
+
+The device is picky about the reply. Wrong body, wrong line endings, a content type that is not text/plain, and it does one of two things. Either it retries after ErrorDelay, again and again, or it silently gives up and the punch sits on the device. Neither failure shows up as an error anywhere you can see. You just notice a punch missing an hour later.
+
+So every reply from my server is text/plain with a trailing newline, and I settled on LF rather than CRLF after testing both.
+
+The other half of this is what to do when the server itself fails. If the database is down and I answer OK anyway, the device deletes its copy and the punch is gone forever. So the rule became simple. Store the raw request first. If storing fails, answer 503. The device keeps its buffer and retries. Never acknowledge data you have not written.
+
+```go
+if err := store.SaveRaw(r.Context(), raw); err != nil {
+	http.Error(w, "retry later", http.StatusServiceUnavailable)
+	return
+}
+w.Header().Set("Content-Type", "text/plain")
+io.WriteString(w, "OK\n")
+```
+
+This is the single most important thing in the whole gateway and it is six lines.
+
+## Sending work to the device
+
+To tell the device to do something, you put a command in a queue. On the next heartbeat, instead of OK, you reply with a line like this.
+
+```
+C:12:DATA QUERY USERINFO
+```
+
+The number is your command id. The device runs it and then POSTs the result to a devicecmd path, with the id echoed back and a return code. Zero is success, negative is an error.
+
+```
+ID=12&Return=0&CMD=DATA
+```
+
+I needed this one for names. The device only sends a USER line, with PIN and Name, when somebody is added or edited on the terminal. If you set up the server after the users already exist, you have punches from PIN 1001 and no idea who that is. DATA QUERY USERINFO asks it to send everyone.
+
+What surprised me is where the answer arrived. Not under some users table, but under table=OPERLOG, the same table used for machine operation logs, as USER lines. I spent an evening thinking the command had failed because I was looking in the wrong place.
+
+## Store bytes first, parse later
+
+I made one decision early that saved me many times. Any request that carries an SN parameter anywhere — not just under /iclock — gets stored exactly as it arrived. Method, path, query string, headers, and the raw body bytes. Parsing is a separate step that runs afterwards and never changes the stored record.
+
+This mattered because firmware varies. Some units add .aspx to every path. Some skip the /iclock prefix. Some send SN in lower case. If my router had only matched the documented paths, I would have dropped traffic without ever knowing.
+
+It also mattered because the Content-Type header lied more than once. The parser classifies the body by looking at the bytes, tab-separated or key=value or JSON or binary, and only uses the header for a note. A hex view in the console saved me when a line ending turned out to be CR instead of LF.
+
+One thing I do at capture time, before anything is stored or logged, is redact fingerprint templates and user passwords. Those come through on some operation log lines and there is no reason for them to sit in my database.
+
+## Timezones and duplicates
+
+The timestamp on each punch is device local time with no zone attached. 2026-10-11 09:02:17 means whatever the device thinks nine in the morning is. I store that string raw and convert explicitly using the zone the device is configured for. The first time I let a date library parse it as UTC, every punch moved by five and a half hours and the day boundaries went wrong.
+
+Duplicates were the other thing. When the device retries after an ErrorDelay, or replays after being offline, the same punch arrives twice. The dedupe key I use is a hash of serial, PIN, time, verify mode and status. Same person, same second, same method, same direction — that is one punch. I tested offline replay by unplugging the network cable, punching a few times, and plugging it back in. The punches did come through late, and the hash caught the repeats.
+
+## Why I logged every request
+
+I kept a research file next to the code with every claim about the protocol labelled one of four ways. DOCUMENTED means I read it in the ZKTeco push protocol docs. OBSERVED ON DEVICE means I saw it in captured traffic, with the request id linked. ASSUMED means it is a guess I am using in code. UNKNOWN means I do not know yet.
+
+This sounds like extra work. It was the opposite. Every time the device did something odd, I could look at the raw request, compare with what I had assumed, and update one line. Several things I had taken as fact from the docs moved to ASSUMED after a week of real traffic. The verify code mapping is still partly UNKNOWN.
+
+The captured requests also became my test data. A small script replays them against a fresh server, so I can change the parser without the physical device on my desk.
+
+One last thing. This all runs over plain HTTP. I could not verify that the firmware supports HTTPS, and old units generally do not. So there are no secrets in the protocol at all. The gateway accepts traffic only from serials it knows about, rate limits the rest, and the real security boundary is the network the device sits on.
+
+On top of all this sits a small layer that works out first punch in and last punch out per person per day, and sends a plain sentence when someone is late. That part took a day. Getting the machine to trust my OK took a week.

@@ -110,7 +110,7 @@ export default function AdminPage() {
   if (!authed) {
     return (
       <div className="max-w-sm mx-auto mt-32">
-        <h1 className="font-heading text-2xl font-bold tracking-tight mb-6">
+        <h1 className="display text-2xl font-bold tracking-tight mb-6">
           Admin
         </h1>
         <form onSubmit={handleLogin} className="space-y-4">
@@ -119,13 +119,13 @@ export default function AdminPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-card text-fg focus:outline-none focus:border-accent transition-colors"
+            className="w-full px-4 py-2.5 border border-fg/40 bg-card text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus:border-accent transition-colors"
             autoFocus
           />
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-accent-text text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full px-4 py-2.5 rounded-lg bg-accent text-white font-medium hover:opacity-90 transition-opacity"
+            className="w-full px-4 py-2.5 bg-fg text-bg font-mono text-xs uppercase tracking-[0.06em] hover:opacity-90 transition-opacity"
           >
             Login
           </button>
@@ -145,7 +145,7 @@ export default function AdminPage() {
           <ArrowLeft size={14} /> back
         </button>
 
-        <h1 className="font-heading text-2xl font-bold tracking-tight mb-6">
+        <h1 className="display text-2xl font-bold tracking-tight mb-6">
           New Post
         </h1>
 
@@ -155,7 +155,7 @@ export default function AdminPage() {
             value={title}
             onChange={(e) => handleTitleChange(e.target.value)}
             placeholder="Post title"
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-card text-fg focus:outline-none focus:border-accent transition-colors font-heading font-bold text-lg"
+            className="w-full px-4 py-2.5 border border-fg/40 bg-card text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus:border-accent transition-colors display font-bold text-lg"
             required
           />
           <input
@@ -163,28 +163,28 @@ export default function AdminPage() {
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             placeholder="url-slug (auto-generated)"
-            className="w-full px-3 py-2 rounded-lg border border-border bg-card text-muted text-sm focus:outline-none focus:border-accent transition-colors font-mono"
+            className="w-full px-3 py-2 border border-fg/40 bg-card text-muted text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus:border-accent transition-colors font-mono"
           />
           <input
             type="text"
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
             placeholder="Short summary (for SEO & previews)"
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-card text-fg focus:outline-none focus:border-accent transition-colors text-sm"
+            className="w-full px-4 py-2.5 border border-fg/40 bg-card text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus:border-accent transition-colors text-sm"
           />
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Write your post in Markdown..."
             rows={18}
-            className="w-full px-4 py-3 rounded-lg border border-border bg-card text-fg focus:outline-none focus:border-accent transition-colors font-mono text-sm leading-relaxed resize-y"
+            className="w-full px-4 py-3 border border-fg/40 bg-card text-fg focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent focus:border-accent transition-colors font-mono text-sm leading-relaxed resize-y"
             required
           />
           <div className="flex gap-3">
             <button
               type="submit"
               disabled={publishing}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-fg text-bg font-mono text-xs uppercase tracking-[0.06em] hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               <Send size={14} />
               {publishing ? "Publishing..." : "Publish"}
@@ -192,7 +192,7 @@ export default function AdminPage() {
             <button
               type="button"
               onClick={() => setMode("list")}
-              className="px-5 py-2.5 rounded-lg border border-border text-muted hover:text-fg transition-colors"
+              className="px-5 py-2.5 border border-border text-muted hover:text-fg transition-colors"
             >
               Cancel
             </button>
@@ -206,12 +206,12 @@ export default function AdminPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-heading text-2xl font-bold tracking-tight">
+        <h1 className="display text-2xl font-bold tracking-tight">
           Blog Admin
         </h1>
         <button
           onClick={() => setMode("write")}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-accent text-white text-sm font-medium hover:opacity-90 transition-opacity"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-fg text-bg font-mono text-xs uppercase tracking-[0.06em] hover:opacity-90 transition-opacity"
         >
           <Plus size={14} /> New Post
         </button>
@@ -224,7 +224,7 @@ export default function AdminPage() {
           {posts.map((post) => (
             <div
               key={post.slug}
-              className="card !p-4 flex items-center justify-between"
+              className="frame flex items-center justify-between p-4"
             >
               <div>
                 <a
@@ -238,7 +238,7 @@ export default function AdminPage() {
               </div>
               <button
                 onClick={() => handleDelete(post.slug)}
-                className="p-1.5 rounded-md text-muted hover:text-red-500 transition-colors"
+                className="p-1.5 text-muted hover:text-accent transition-colors"
                 aria-label="Delete post"
               >
                 <Trash2 size={14} />

@@ -1,220 +1,168 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Mail, FileDown, ArrowUpRight, ArrowRight } from "lucide-react";
-import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/icons";
 import { getBlogPosts } from "@/lib/blog";
-
-const socials = [
-  { icon: GitHubIcon, href: "https://github.com/anukulrajan7", label: "GitHub" },
-  { icon: LinkedInIcon, href: "https://linkedin.com/in/anukul-raj-31b6a2193", label: "LinkedIn" },
-  { icon: XIcon, href: "https://x.com/R01202183Raj", label: "X" },
-  { icon: Mail, href: "mailto:anukulraj2004@gmail.com", label: "Email" },
-];
-
-const work = [
-  {
-    company: "Wokay",
-    roles: [{ title: "Product Engineer 2", period: "Jan 2026 — present" }],
-    url: "https://wokay.com",
-  },
-  {
-    company: "Social X",
-    roles: [{ title: "Frontend Engineer", period: "Sep 2024 — Dec 2025" }],
-    url: null,
-  },
-  {
-    company: "Echo",
-    roles: [{ title: "Frontend Engineer Intern", period: "Jul 2023 — May 2024" }],
-    url: null,
-  },
-  {
-    company: "iMeet Technologies",
-    roles: [{ title: "Frontend Developer Intern", period: "Apr — Jul 2023" }],
-    url: null,
-  },
-];
-
-const projects = [
-  {
-    name: "Wokay",
-    description: "Real-time workspace — chat, tasks, and video calls for teams",
-    tags: ["React", "Node.js", "TypeScript", "PostgreSQL"],
-    url: "https://wokay.com",
-  },
-  {
-    name: "DoctorBooking",
-    description: "Healthcare platform for booking appointments with doctors",
-    tags: ["React", "Express", "MongoDB", "Stripe"],
-    url: "https://github.com/anukulrajan7/DoctorBooking",
-  },
-  {
-    name: "Social-X",
-    description: "Social media app with feeds, profiles, and follow system",
-    tags: ["TypeScript", "Next.js", "Tailwind"],
-    url: "https://github.com/anukulrajan7/social-x",
-  },
-  {
-    name: "EdTech LMS",
-    description: "Learning management system with course creation and dashboards",
-    tags: ["React", "Express", "MongoDB"],
-    url: "https://github.com/anukulrajan7/edtechLms",
-  },
-];
+import { projects, roles, selectedProjectIds, site } from "@/lib/site-data";
+import { formatLogDate } from "@/lib/format";
+import { ContourField } from "@/components/contour-field";
+import { SignalReadout } from "@/components/signal-readout";
+import { RouteTimeline } from "@/components/route-timeline";
+import { SectionLabel } from "@/components/ui/section-label";
+import { Frame } from "@/components/ui/frame";
+import { ProjectRow } from "@/components/project-row";
 
 export default function Home() {
   const posts = getBlogPosts()
     .sort((a, b) => new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime())
     .slice(0, 3);
 
+  const selected = selectedProjectIds
+    .map((id) => projects.find((p) => p.id === id))
+    .filter((p): p is NonNullable<typeof p> => p !== undefined);
+
+  const routePreview = roles.map((r) => ({
+    id: r.id,
+    code: r.code,
+    span: r.span,
+    title: r.company,
+    subtitle: `${r.title} — ${r.summary}`,
+    current: r.current,
+  }));
+
   return (
-    <div className="space-y-16">
+    <div className="space-y-24 md:space-y-32">
       {/* Hero */}
-      <section className="fade-in">
-        <div className="flex items-start gap-5">
-          <Image
-            src="/avatar.jpg"
-            alt="Anukul Raj"
-            width={80}
-            height={80}
-            className="rounded-full ring-2 border-border shrink-0 mt-1"
-            priority
-          />
-          <div>
-            <h1 className="font-heading text-2xl font-extrabold tracking-tight">
-              Anukul Raj
+      <section className="relative -mx-5 md:-mx-8 px-5 md:px-8 pt-6 pb-10 md:pt-10 md:pb-16 overflow-hidden">
+        <ContourField
+          className="absolute inset-0 w-full h-full"
+          seed={17385}
+        />
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at 30% 40%, transparent 30%, var(--c-bg) 85%)",
+          }}
+        />
+
+        <div className="relative grid grid-cols-12 gap-x-6 gap-y-10">
+          <div className="col-span-12 lg:col-span-8">
+            <p className="label rise" style={{ "--i": 0 } as React.CSSProperties}>
+              §00 — field log · Hyderabad, IN
+            </p>
+            <h1
+              className="display mt-6 text-[3.4rem] sm:text-[4.6rem] md:text-[6rem] rise"
+              style={{ "--i": 1 } as React.CSSProperties}
+            >
+              Anukul <span className="italic">Raj</span>
             </h1>
-            <p className="text-muted text-sm mt-1">
-              Product Engineer 2 at{" "}
-              <a href="https://wokay.com" target="_blank" rel="noopener" className="text-accent hover:underline underline-offset-2">
-                Wokay
-              </a>
-              {" "}&middot; Hyderabad, India
+            <p
+              className="mt-8 max-w-[34ch] text-[1.2rem] md:text-[1.45rem] leading-[1.4] rise"
+              style={{ "--i": 2 } as React.CSSProperties}
+            >
+              {site.heroLine}
+            </p>
+          </div>
+
+          <div className="col-span-12 sm:col-span-8 lg:col-span-4 lg:pt-10 rise" style={{ "--i": 3 } as React.CSSProperties}>
+            <SignalReadout status={site.status} />
+          </div>
+
+          <div
+            className="col-span-12 lg:col-span-8 flex items-start gap-4 pt-2 border-t border-border rise"
+            style={{ "--i": 4 } as React.CSSProperties}
+          >
+            <Image
+              src="/avatar.jpg"
+              alt="Anukul Raj"
+              width={44}
+              height={44}
+              className="shrink-0 mt-3 border border-border p-[2px] bg-card"
+              priority
+            />
+            <p className="mt-3 text-[15px] text-muted max-w-[60ch]">
+              <span className="label text-fg mr-3">now</span>
+              {site.now}
             </p>
           </div>
         </div>
+      </section>
 
-        <p className="mt-5 leading-relaxed">
-          I build fast, accessible web interfaces for products people use every
-          day. Currently owning the task management and chat modules in a
-          real-time collaboration platform — handling virtualized rendering,
-          state management, and performance at scale.
-        </p>
+      {/* Work preview */}
+      <section id="work">
+        <SectionLabel index="01" name="Work" aside={<Link href="/work" className="hover:text-fg transition-colors">full route →</Link>} />
+        <div className="mt-10 md:grid md:grid-cols-12 md:gap-8">
+          <p className="md:col-span-4 text-muted max-w-[36ch]">
+            Four stops so far. Two internships, a startup frontend from zero, and a real-time workspace
+            where I now own tasks, chat and the calling and tracking features around them.
+          </p>
+          <div className="mt-10 md:mt-0 md:col-span-8">
+            <RouteTimeline waypoints={routePreview} dense />
+          </div>
+        </div>
+      </section>
 
-        <div className="flex items-center gap-2 flex-wrap mt-5">
-          {socials.map(({ icon: Icon, href, label }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noopener"
-              className="inline-flex items-center gap-1.5 text-[13px] text-muted hover:text-fg border border-border rounded-lg px-3 py-1.5 transition-all hover:border-accent/40 hover:bg-surface"
-              aria-label={label}
-            >
-              <Icon size={14} />
-              <span>{label}</span>
-            </a>
-          ))}
-          <a
-            href="/resume.pdf"
-            download
-            className="inline-flex items-center gap-1.5 text-[13px] text-muted hover:text-fg border border-border rounded-lg px-3 py-1.5 transition-all hover:border-accent/40 hover:bg-surface"
-          >
-            <FileDown size={14} />
-            <span>Resume</span>
-          </a>
+      {/* Selected projects */}
+      <section id="projects">
+        <SectionLabel index="02" name="Projects" aside={<Link href="/projects" className="hover:text-fg transition-colors">all entries →</Link>} />
+        <div className="mt-10 md:grid md:grid-cols-12 md:gap-8">
+          <h2 className="display text-[2rem] md:text-[2.4rem] md:col-span-4 max-w-[14ch]">
+            Things that run while I <span className="italic">sleep</span>.
+          </h2>
+          <ol className="mt-8 md:mt-0 md:col-span-8 border-t border-border">
+            {selected.map((p, i) => (
+              <ProjectRow key={p.id} project={p} index={i} />
+            ))}
+          </ol>
         </div>
       </section>
 
       {/* Writing */}
-      {posts.length > 0 && (
-        <section className="fade-in">
-          <h2 className="font-heading text-xs font-bold text-muted uppercase tracking-widest mb-5">
-            Writing
-          </h2>
-          <div className="space-y-2">
+      {posts.length > 0 ? (
+        <section id="writing">
+          <SectionLabel index="03" name="Writing" aside={<Link href="/blog" className="hover:text-fg transition-colors">all entries →</Link>} />
+          <ul className="mt-10 grid gap-px md:grid-cols-3 bg-border border border-border">
             {posts.map((post) => (
-              <Link key={post.slug} href={`/blog/${post.slug}`} className="card block group !p-4">
-                <div className="flex justify-between items-start gap-4">
-                  <div>
-                    <span className="font-medium group-hover:text-accent transition-colors">
-                      {post.metadata.title}
-                    </span>
-                    <p className="text-xs text-muted mt-1 line-clamp-1">
-                      {post.metadata.summary}
-                    </p>
-                  </div>
-                  <span className="text-xs text-muted shrink-0 tabular-nums mt-0.5">
-                    {new Date(post.metadata.date).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
-                  </span>
-                </div>
-              </Link>
+              <li key={post.slug} className="bg-bg">
+                <Link href={`/blog/${post.slug}`} className="group block h-full p-6 hover:bg-card transition-colors">
+                  <time className="label tabular-nums" dateTime={post.metadata.date}>
+                    {formatLogDate(post.metadata.date)}
+                  </time>
+                  <h3 className="display text-[1.35rem] mt-4 group-hover:text-accent transition-colors">
+                    {post.metadata.title}
+                  </h3>
+                  <p className="mt-3 text-sm text-muted line-clamp-3">{post.metadata.summary}</p>
+                  <span className="label block mt-6">{post.metadata.readingTime}</span>
+                </Link>
+              </li>
             ))}
-          </div>
-          <Link href="/blog" className="inline-flex items-center gap-1 mt-4 text-sm text-muted hover:text-accent transition-colors">
-            all posts <ArrowRight size={13} />
-          </Link>
+          </ul>
         </section>
-      )}
+      ) : undefined}
 
-      {/* Work */}
-      <section className="fade-in">
-        <h2 className="font-heading text-xs font-bold text-muted uppercase tracking-widest mb-5">
-          Work
-        </h2>
-        <div className="space-y-5 border-l-2 border-border pl-5 ml-1">
-          {work.map((item) => (
-            <div key={item.company}>
-              <div className="flex items-baseline gap-2">
-                {item.url ? (
-                  <a href={item.url} target="_blank" rel="noopener" className="font-heading font-bold hover:text-accent transition-colors">
-                    {item.company}
-                  </a>
-                ) : (
-                  <span className="font-heading font-bold">{item.company}</span>
-                )}
-              </div>
-              {item.roles.map((role) => (
-                <div key={role.title} className="flex justify-between items-baseline mt-1">
-                  <span className="text-sm text-muted">{role.title}</span>
-                  <span className="text-xs text-muted tabular-nums">{role.period}</span>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <Link href="/work" className="inline-flex items-center gap-1 mt-5 text-sm text-muted hover:text-accent transition-colors">
-          full experience <ArrowRight size={13} />
-        </Link>
-      </section>
-
-      {/* Projects */}
-      <section className="fade-in">
-        <h2 className="font-heading text-xs font-bold text-muted uppercase tracking-widest mb-5">
-          Projects
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {projects.map((project) => (
-            <a key={project.name} href={project.url} target="_blank" rel="noopener" className="card group">
-              <div className="flex items-start justify-between">
-                <h3 className="font-heading font-bold group-hover:text-accent transition-colors">
-                  {project.name}
-                </h3>
-                <ArrowUpRight size={14} className="text-muted opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" />
-              </div>
-              <p className="text-xs text-muted mt-1.5 leading-relaxed">{project.description}</p>
-              <div className="flex flex-wrap gap-1.5 mt-3">
-                {project.tags.map((tag) => (
-                  <span key={tag} className="text-[11px] px-2 py-0.5 rounded-md bg-surface border border-border text-muted">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </a>
-          ))}
-        </div>
-        <Link href="/projects" className="inline-flex items-center gap-1 mt-4 text-sm text-muted hover:text-accent transition-colors">
-          all projects <ArrowRight size={13} />
-        </Link>
+      {/* Arcade teaser */}
+      <section id="arcade">
+        <SectionLabel index="04" name="Arcade" />
+        <Frame className="mt-10 grid md:grid-cols-12 gap-6 p-6 md:p-8">
+          <div className="md:col-span-7">
+            <h2 className="display text-[1.8rem] md:text-[2.2rem]">
+              A handheld in the <span className="italic">margins</span>.
+            </h2>
+            <p className="mt-4 text-muted max-w-[52ch]">
+              Small games on a CRT-style panel, drawn in the same paper and ink as the rest of this
+              site. Built for breaks between log entries.
+            </p>
+          </div>
+          <div className="md:col-span-5 flex md:justify-end items-end">
+            <Link
+              href="/arcade"
+              className="inline-flex items-center gap-3 border border-fg px-4 h-11 label text-fg hover:bg-fg hover:text-bg transition-colors"
+            >
+              insert coin
+              <span aria-hidden>→</span>
+            </Link>
+          </div>
+        </Frame>
       </section>
     </div>
   );
