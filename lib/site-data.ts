@@ -97,7 +97,7 @@ export const roles: Role[] = [
     span: "Jan 2025 to now",
     company: "Wokay",
     title: "Product Engineer 2",
-    url: "https://wokay.com",
+    url: "https://www.wokay.com",
     current: true,
     summary: "Tasks, chat, notifications and live location tracking in a real-time workspace.",
     points: [

@@ -63,7 +63,7 @@ const personSchema = {
   url: site.url,
   image: `${site.url}${site.photo}`,
   jobTitle: "Product Engineer 2",
-  worksFor: { "@type": "Organization", name: "Wokay", url: "https://wokay.com" },
+  worksFor: { "@type": "Organization", name: "Wokay", url: "https://www.wokay.com" },
   address: { "@type": "PostalAddress", addressLocality: "Hyderabad", addressCountry: "IN" },
   email: `mailto:${site.email}`,
   sameAs: [site.github, site.linkedin, site.x],

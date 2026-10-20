@@ -1,0 +1,118 @@
+/* Arcade hub + play screen: motion only. Colours and type come from app/globals.css tokens. */
+
+.arcade-cover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.arcade-card:hover .arcade-cover,
+.arcade-card:focus-visible .arcade-cover,
+.arcade-card[data-focused="true"] .arcade-cover {
+  transform: translateY(-4px);
+  box-shadow: 6px 6px 0 0 var(--c-fg);
+}
+
+.arcade-cover-fall,
+.arcade-cover-drift,
+.arcade-cover-trail {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.arcade-card:hover .arcade-cover-fall,
+.arcade-card:focus-visible .arcade-cover-fall {
+  animation: arcade-fall 1.4s cubic-bezier(0.3, 0.9, 0.3, 1) both;
+}
+.arcade-card:hover .arcade-cover-drift,
+.arcade-card:focus-visible .arcade-cover-drift {
+  animation: arcade-drift 2.2s ease-in-out infinite alternate;
+}
+.arcade-card:hover .arcade-cover-trail,
+.arcade-card:focus-visible .arcade-cover-trail {
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: arcade-trail 1.6s ease-out forwards;
+}
+.arcade-card:hover .arcade-cover-trail path:last-child,
+.arcade-card:focus-visible .arcade-cover-trail path:last-child {
+  stroke-dasharray: 5 6;
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+@keyframes arcade-fall {
+  from {
+    transform: translateY(-40px);
+  }
+  to {
+    transform: translateY(96px);
+  }
+}
+@keyframes arcade-drift {
+  from {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate(10px, -8px) rotate(-6deg);
+  }
+}
+@keyframes arcade-trail {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Play screen enters with a quick rise; menu panels pop. */
+@keyframes arcade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.arcade-rise {
+  animation: arcade-rise 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes arcade-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.arcade-pop {
+  animation: arcade-pop 0.22s cubic-bezier(0.2, 1.2, 0.3, 1) both;
+}
+@keyframes arcade-hint {
+  from {
+    transform: translateY(-6px) rotate(-1.5deg);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(-1.5deg);
+    opacity: 1;
+  }
+}
+.arcade-hint {
+  animation: arcade-hint 0.25s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arcade-cover,
+  .arcade-cover-fall,
+  .arcade-cover-drift,
+  .arcade-cover-trail,
+  .arcade-rise,
+  .arcade-pop,
+  .arcade-hint {
+    animation: none !important;
+    transition: none !important;
+  }
+  .arcade-card:hover .arcade-cover,
+  .arcade-card:focus-visible .arcade-cover {
+    transform: none;
+  }
+}

@@ -223,18 +223,15 @@ export const capabilities: Capability[] = [
     color: 5,
     title: "Calling on WebRTC",
     evidence:
-      "Audio and video calling on a mediasoup SFU at Wokay. TalkToFriend does P2P mesh up to four people and switches to an SFU at five, load tested to 1,500 connections.",
-    proof: [
-      { label: "TalkToFriend", href: "/projects#talktofriend" },
-      { label: "Wokay", href: "#wokay" },
-    ],
+      "TalkToFriend, my own project: P2P mesh up to four people, a mediasoup SFU from five, load tested to 1,500 connections.",
+    proof: [{ label: "TalkToFriend", href: "/projects#talktofriend" }],
   },
   {
     icon: "pin",
     color: 4,
     title: "Live location on real phones",
     evidence:
-      "Background tracking for Wokay's field-force feature in React Native, designed around battery life on real Android phones.",
+      "The geo module at Wokay: background tracking in React Native, designed around battery life on real Android phones. Researched with Device Tracker: fused location, self-hosted OSRM routing, and cost per user.",
     proof: [
       { label: "Wokay", href: "#wokay" },
     ],
