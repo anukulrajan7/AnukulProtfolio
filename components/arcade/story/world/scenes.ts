@@ -98,8 +98,8 @@ export function buildHome(era: Era = "now"): Scene {
         glow(ctx, 816, 158, 200, C.sun, 0.25 * env.w.dawn);
       },
     },
-    poster(230, 120, ["ship it", "(carefully)"], C.sun),
-    poster(640, 110, ["git push", "and pray"], C.lilac),
+    poster(230, 120, ["put it live", "(carefully)"], C.sun),
+    poster(640, 110, ["send it", "and hope"], C.lilac),
     shelf(270, FLOOR),
     // bed
     prop(60, 230, 190, 90, (s) => {
@@ -183,7 +183,7 @@ function laptopScreen(ctx: CanvasRenderingContext2D, env: Env, x: number, y: num
     return;
   }
   if (st === "build") {
-    label(ctx, "building…", x + w / 2, y + 10, { size: 7, font: "mono", align: "center" });
+    label(ctx, "working…", x + w / 2, y + 10, { size: 7, font: "mono", align: "center" });
     inkRect(ctx, 61, x + 6, y + 18, w - 12, 8, 2, { fill: C.paper, stroke: C.ink, lw: 1.5 });
     ctx.fillStyle = C.mint;
     ctx.fillRect(x + 8, y + 20, (w - 16) * smooth(Math.min(1, env.w.buildT)), 4);
@@ -222,7 +222,7 @@ function laptopScreen(ctx: CanvasRenderingContext2D, env: Env, x: number, y: num
   }
   inkCircle(ctx, 62, x + w / 2, y + 13, 7, { fill: C.mint, stroke: C.ink, lw: 1.5 });
   inkPoly(ctx, 63, [[x + w / 2 - 3, y + 13], [x + w / 2 - 1, y + 16], [x + w / 2 + 4, y + 10]], { stroke: C.ink, lw: 1.5 }, false);
-  label(ctx, "214 tests pass", x + w / 2, y + 28, { size: 6.5, font: "mono", align: "center" });
+  label(ctx, "214 checks pass", x + w / 2, y + 28, { size: 6.5, font: "mono", align: "center" });
 }
 
 export function deskThing(ctx: CanvasRenderingContext2D, k: string, x: number, y: number) {
@@ -341,7 +341,7 @@ export function buildOffice(era: Era = "now"): Scene {
     boardProp(),
     windowNight(486, 76, 96, 110, "evening"),
     wallClock(760, 100),
-    poster(640, 92, ["ship small", "ship often"], C.sun),
+    poster(640, 92, ["release small", "release often"], C.sun),
     // right door to the street
     prop(1010, 120, 64, 176, (s) => {
       s.rect(1010, 120, 64, 176, 3, { fill: C.surface2, stroke: C.ink });
@@ -434,7 +434,7 @@ export function buildOffice(era: Era = "now"): Scene {
     hotspots: [
       { id: "board", x: 256, r: 110, gy: 104, label: "Task board", kind: "use" },
       { id: "zoya", x: 590, r: 46, gy: 176, label: "Zoya", kind: "talk" },
-      { id: "id", x: 913, r: 18, gy: 232, label: "ID card", kind: "use" },
+      { id: "id", x: 913, r: 18, gy: 232, label: "Badge", kind: "use" },
       { id: "phone", x: 941, r: 18, gy: 230, label: "Test phone", kind: "use" },
       { id: "exit", x: 1040, r: 34, gy: 190, label: "Exit", kind: "door" },
     ],
@@ -453,7 +453,7 @@ export function buildOffice(era: Era = "now"): Scene {
       ctx.fillRect(-20, -20, width + 40, H + 40);
       ctx.restore();
     },
-    describe: "An open office with a light cobalt wall. A task board on the left, Zoya at her desk, your desk with a monitor, an ID card and a test phone, and an exit door on the right.",
+    describe: "An open office with a light cobalt wall. A task board on the left, Zoya at her desk, your desk with a monitor, a badge and a test phone, and an exit door on the right.",
   };
 }
 
@@ -588,7 +588,7 @@ export function buildStreet(): Scene {
       }
       ctx.restore();
     },
-    describe: "A city street in the late afternoon. An office door, a chai stall, tall buildings close together, a flyover underpass, stairs down to a Maggi place, and a lake with a bench at the end.",
+    describe: "A city street in the late afternoon. An office door, a chai stall, tall buildings close together, a road bridge to walk under, stairs down to a Maggi place, and a lake with a bench at the end.",
   };
 }
 

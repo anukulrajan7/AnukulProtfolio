@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { audio } from "./engine/audio";
-import { clearSave, loadPrefs, loadSave } from "./engine/save";
+import { clearSave, loadMemory, loadPrefs, loadSave } from "./engine/save";
 import { Phone } from "./world/map";
 import { buildHome } from "./world/scenes";
 import { Game } from "./story/core";
-import { runSlice } from "./story/script";
-import { freshRun, KEEPSAKES, type Ui } from "./story/types";
+import { GROUPS, runSlice } from "./story/script";
+import { freshRun, KEEPSAKES, PEOPLE, type Ui } from "./story/types";
 import { Bubble, Card, Controls, Hud, KeepIcon, KeepsakeToast, Prompt, Settings, Transcript, useUi } from "./ui/overlay";
 
 const selScreen = (s: Ui) => s.screen;
@@ -93,6 +93,7 @@ function StageLayer({ g, compact }: { g: Game; compact: boolean }) {
         </>
       ) : null}
       {screen === "title" ? <Title g={g} /> : null}
+      {screen === "pick" ? <Picker g={g} /> : null}
       {screen === "end" ? <End g={g} /> : null}
       {paused && screen === "play" ? <Pause g={g} /> : null}
     </div>
@@ -105,44 +106,91 @@ function BottomLayer({ g, compact }: { g: Game; compact: boolean }) {
   return <Controls g={g} compact />;
 }
 
-function start(g: Game, mode: "new" | "continue") {
+type Mode = "new" | "continue" | { only: string } | "finale";
+
+function start(g: Game, mode: Mode) {
   g.resetScripts();
   g.fresh = true;
   g.phone = new Phone();
   let from = "prologue";
+  let only: string | undefined;
   const save = mode === "continue" ? loadSave() : null;
   if (save && save.checkpoint !== "done") {
     g.run = { flags: save.flags, ledger: save.ledger, keepsakes: save.keepsakes, people: save.people, chai: save.chai, understanding: save.understanding, name: save.name };
     g.phone.fixes = save.fixes ?? [];
     from = save.checkpoint;
+    only = save.only;
   } else {
     clearSave();
     g.run = freshRun();
+    if (mode === "finale") {
+      from = "finale";
+      g.run.keepsakes = [...loadMemory().kept];
+    } else if (typeof mode === "object") {
+      from = GROUPS[mode.only][0];
+      only = mode.only;
+    }
   }
   g.ui.set({ screen: "play", keepsakes: [...g.run.keepsakes], end: null, paused: false });
   g.root.focus({ preventScroll: true });
-  void runSlice(g, from);
+  void runSlice(g, from, only);
+}
+
+function Picker({ g }: { g: Game }) {
+  const [mem] = useState(loadMemory);
+  const all = PEOPLE.every((p) => mem.played.includes(p.id));
+  return (
+    <div className="lw-title lw-pick">
+      <div className="lw-title-card lw-pick-card">
+        <h2 className="lw-modal-h">Who do you want to be?</h2>
+        <div className="lw-pick-grid">
+          {PEOPLE.map((p, i) => {
+            const played = mem.played.includes(p.id);
+            return (
+              <button key={p.id} type="button" className="lw-pick-item" onClick={() => start(g, { only: p.id })} autoFocus={i === 0}>
+                <span className="lw-pick-name">{p.name}</span>
+                <span className="lw-pick-years">{p.years}</span>
+                <span className="lw-pick-line">{p.line}</span>
+                {played ? <span className="lw-pick-done">✓ Played</span> : null}
+              </button>
+            );
+          })}
+        </div>
+        <div className="lw-title-actions">
+          <button type="button" className="lw-btn lw-btn-primary" onClick={() => start(g, "new")}>
+            Play the whole story
+          </button>
+          <button type="button" className="lw-btn lw-btn-ghost" disabled={!all} onClick={() => start(g, "finale")}>
+            {all ? "Finale" : "Finale · play all 5 first"}
+          </button>
+          <button type="button" className="lw-btn lw-btn-ghost" onClick={() => g.ui.set({ screen: "title" })}>
+            Back
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function Title({ g }: { g: Game }) {
   const prefs = useUi(g, selPrefs);
   const hasSave = useUi(g, selHasSave);
   const [opts, setOpts] = useState(false);
-  const go = useCallback((m: "new" | "continue") => start(g, m), [g]);
+  const go = useCallback(() => start(g, "continue"), [g]);
   return (
     <div className="lw-title">
       <div className="lw-title-card">
         <p className="lw-kicker">a small story game</p>
         <h2 className="lw-title-h">The Long Way to OK</h2>
         <p className="lw-title-sub">Five developers. Before AI, and after.</p>
-        <p className="lw-note">Four people you might know. And me. (Anukul)</p>
+        <p className="lw-note">Pick a person and play their story. Each one takes about 3 minutes.</p>
         <div className="lw-title-actions">
           {hasSave ? (
-            <button type="button" className="lw-btn lw-btn-primary" onClick={() => go("continue")} autoFocus>
+            <button type="button" className="lw-btn lw-btn-primary" onClick={go} autoFocus>
               Continue
             </button>
           ) : null}
-          <button type="button" className={`lw-btn ${hasSave ? "lw-btn-ghost" : "lw-btn-primary"}`} onClick={() => go("new")} autoFocus={!hasSave}>
+          <button type="button" className={`lw-btn ${hasSave ? "lw-btn-ghost" : "lw-btn-primary"}`} onClick={() => g.ui.set({ screen: "pick" })} autoFocus={!hasSave}>
             {hasSave ? "New run" : "Play"}
           </button>
           <button type="button" className="lw-btn lw-btn-ghost" aria-pressed={prefs.sound} onClick={() => g.setPrefs({ ...prefs, sound: !prefs.sound })}>
@@ -153,9 +201,7 @@ function Title({ g }: { g: Game }) {
           </button>
         </div>
         {opts ? <Settings g={g} prefs={prefs} /> : null}
-        <p className="lw-controls-help">
-          Walk <kbd>A</kbd>/<kbd>D</kbd> or arrows · use <kbd>E</kbd> · accept <kbd>Tab</kbd> · inspect hold <kbd>Q</kbd> · reject <kbd>R</kbd> · pause <kbd>Esc</kbd>. On a phone: tap to walk, tap glints, long-press to inspect. About 20 minutes.
-        </p>
+        <p className="lw-controls-help">Move: A / D or arrow keys. Use: E. On a phone: tap to walk, tap things to use them.</p>
       </div>
     </div>
   );
@@ -195,6 +241,16 @@ function Pause({ g }: { g: Game }) {
             }}
           >
             Title screen
+          </button>
+          <button
+            type="button"
+            className="lw-btn lw-btn-ghost"
+            onClick={() => {
+              g.resetScripts();
+              g.ui.set({ screen: "pick", paused: false });
+            }}
+          >
+            Switch person
           </button>
           <Link className="lw-btn lw-btn-ghost" href="/arcade">
             Leave
@@ -244,6 +300,9 @@ function End({ g }: { g: Game }) {
         <div className="lw-title-actions">
           <button type="button" className="lw-btn lw-btn-primary" onClick={() => start(g, "new")}>
             Play again
+          </button>
+          <button type="button" className="lw-btn lw-btn-ghost" onClick={() => g.ui.set({ screen: "pick" })}>
+            Choose a person
           </button>
           <Link className="lw-btn lw-btn-ghost" href="/arcade">
             Back to the arcade

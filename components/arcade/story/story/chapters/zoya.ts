@@ -29,9 +29,9 @@ export async function zoya(g: Game) {
     await eraCard(g, "ai", "2026 · with AI", "Zoya is 22. First job. She has never coded without AI.");
   });
   g.checkpoint("zoya");
-  g.setGoal("Finish your first ticket.");
+  g.setGoal("Finish your first task.");
   const s = g.npcs.sen;
-  await g.say("tab", "Your first ticket? Done. Your second one too.", { tab: "proud" });
+  await g.say("tab", "Your first task? Done. Your second one too.", { tab: "proud" });
   await g.say("you", "Easy. Why did everyone say this job is hard?", { mood: "happy" });
   await g.say("narrator", "Half her class stopped learning to code. 'AI does it,' they said.");
   await walkIn(g, s, 700);
@@ -59,7 +59,7 @@ export async function zoya(g: Game) {
   await g.say("tab", "I'm… having… some… trouble…", { tab: "sad" });
   await fadeTab(g, true);
   g.tab.glitch = glitch;
-  await g.say("narrator", "Tab is down. Everywhere.");
+  await g.say("narrator", "Tab has stopped working. Everywhere.");
   await eraCard(g, "off", "2026 · without AI", "For one afternoon, there is no Tab.");
   g.setGoal("Fix the checkout. Without Tab.");
   await g.say("you", "Okay. No Tab. Um.", { mood: "worried" });
@@ -78,7 +78,7 @@ export async function zoya(g: Game) {
   }
   for (;;) {
     const i = await g.choose(
-      [{ text: "Error: something went wrong" }, { text: "TypeError: price is undefined (cart.ts, line 88)" }, { text: "Warning: 400 old warnings" }],
+      [{ text: "Error: something went wrong" }, { text: "Error: price is missing (cart.ts, line 88)" }, { text: "Warning: 400 old warnings" }],
       "Which line matters?",
     );
     if (i === 1) break;
@@ -89,7 +89,7 @@ export async function zoya(g: Game) {
     g.you.anim = "type";
   }
   g.run.understanding++;
-  await g.say("you", "Price is undefined… the new item has no price!", { mood: "surprised" });
+  await g.say("you", "The price is missing… the new item has no price!", { mood: "surprised" });
   await g.press("Add the price");
   audio.ui("accept");
   g.world.monitor = "ok";
@@ -107,6 +107,6 @@ export async function zoya(g: Game) {
   await fadeTab(g, false);
   await g.say("tab", "I'm back! Did I miss anything?", { tab: "eager" });
   await g.say("you", "Nope. Handled it.", { mood: "proud" });
-  await g.say("you", "Next week I join the live-location team. With Anukul.");
+  await g.say("you", "Next week I join the live-map team. With Anukul.");
   await giveKeepsake(g, "read");
 }

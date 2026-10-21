@@ -243,7 +243,7 @@ export function Controls({ g, compact }: { g: Game; compact: boolean }) {
           </span>
           <span className="lw-chips">
             <button type="button" className="lw-chip lw-accept" onClick={() => g.suggestAct("accept")}>
-              Accept <kbd>{prefs.acceptKey === "tab" ? "Tab" : "F"}</kbd>
+              Yes <kbd>{prefs.acceptKey === "tab" ? "Tab" : "F"}</kbd>
             </button>
             <button
               type="button"
@@ -264,10 +264,10 @@ export function Controls({ g, compact }: { g: Game; compact: boolean }) {
               }}
               onKeyUp={() => g.touchInspect(false)}
             >
-              Hold to inspect <kbd>Q</kbd>
+              Hold to look closer <kbd>Q</kbd>
             </button>
             <button type="button" className="lw-chip lw-reject" onClick={() => g.suggestAct("reject")}>
-              Not this <kbd>R</kbd>
+              No <kbd>R</kbd>
             </button>
           </span>
         </div>
@@ -314,9 +314,9 @@ export function Controls({ g, compact }: { g: Game; compact: boolean }) {
 }
 
 const STAMP_LABELS: { k: Stamp; label: string; note: string }[] = [
-  { k: "draw", label: "Draw it", note: "small circles" },
-  { k: "keep", label: "Keep, don't draw", note: "big circles" },
-  { k: "unknown", label: "Unknown", note: "no readings" },
+  { k: "draw", label: "Line (sure)", note: "small circles" },
+  { k: "keep", label: "Circle (not sure)", note: "big circles" },
+  { k: "unknown", label: "Unknown (no signal)", note: "no signal" },
 ];
 
 function Stamps({ g }: { g: Game }) {
@@ -332,7 +332,7 @@ function Stamps({ g }: { g: Game }) {
     g.finishStamps(true);
   };
   return (
-    <div className="lw-stamps" role="group" aria-label="Stamp each stretch of the walk">
+    <div className="lw-stamps" role="group" aria-label="Mark each part of the walk">
       <div className="lw-segs" role="tablist">
         {SEGS.map((s) => (
           <button key={s.id} type="button" role="tab" aria-selected={st.selected === s.id} className="lw-seg" onClick={() => g.selectSeg(s.id)}>
@@ -356,7 +356,7 @@ function Stamps({ g }: { g: Game }) {
           Done <kbd>Enter</kbd>
         </button>
         <button type="button" className="lw-chip lw-ghost" onClick={letItPlay}>
-          Let it play out
+          Play it for me
         </button>
       </div>
     </div>
@@ -408,7 +408,7 @@ export function Settings({ g, prefs }: { g: Game; prefs: Prefs }) {
       </label>
       <label className="lw-row">
         <span>
-          Story-only mode <small>mechanics play themselves; you still choose</small>
+          Story-only mode <small>the game plays itself; you still choose</small>
         </span>
         <input type="checkbox" checked={prefs.storyOnly} onChange={(e) => set({ storyOnly: e.target.checked })} />
       </label>
@@ -433,7 +433,7 @@ export function Settings({ g, prefs }: { g: Game; prefs: Prefs }) {
         </span>
       </div>
       <div className="lw-row">
-        <span>Accept key</span>
+        <span>Yes key</span>
         <span className="lw-seg3">
           {(["tab", "f"] as const).map((t) => (
             <button key={t} type="button" aria-pressed={prefs.acceptKey === t} onClick={() => set({ acceptKey: t })}>

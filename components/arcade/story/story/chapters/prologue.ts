@@ -27,32 +27,33 @@ export async function prologue(g: Game) {
   g.tickers.add((dt) => {
     if (g.world.laptop === "build") g.world.buildT = Math.min(0.92, g.world.buildT + dt * 0.04);
   });
-  await g.say("narrator", "1:12 am. The laptop has been building something for a while.");
-  g.setHint("Walk with A / D or ← →. Glints are things you can touch: press E, or tap them.");
+  await g.say("narrator", "It is 1:12 at night. You are at home.");
+  await g.say("narrator", "Your laptop has been working on something for a while.");
+  g.setHint("Move with A / D or the arrow keys. Press E to use the shiny things.");
 
   g.on("chai", async () => {
     g.you.gesture("sip", 1.6);
     audio.ui("chai");
     await g.wait(1.2);
     g.run.chai++;
-    await g.say("you", f.chai ? "Still cold. Still drinking it." : "Cold. It's always cold by the time I remember it.", { mood: "tired" });
+    await g.say("you", f.chai ? "Still cold. Still drinking it." : "Cold. It is always cold when I remember it.", { mood: "tired" });
     f.chai = true;
   });
   g.on("switch", async () => {
     g.env.light = !g.env.light;
     audio.ui("pocket");
     f.light++;
-    g.bark("you", g.env.light ? "Too bright. Like a dentist." : "Better. The lamp is enough.");
+    g.bark("you", g.env.light ? "Too bright. Like at the dentist." : "Better. The lamp is enough.");
     await g.wait(0.3);
   });
   g.on("window", async () => {
     g.you.gesture("stretch", 1.8);
     await g.wait(0.8);
-    await g.say("you", "Somebody out there is also debugging at 1 am. Hi.", { mood: "neutral" });
+    await g.say("you", "Someone out there is also fixing code at 1 am. Hi.", { mood: "neutral" });
   });
   g.on("bed", async () => {
     g.you.gesture("scratch", 1.4);
-    await g.say("you", "Five more minutes, then sleep. That's a lie and we both know it.");
+    await g.say("you", "Five more minutes, then sleep. That is a lie. We both know it.");
   });
   g.on("laptop", async () => {
     f.laptop = true;
@@ -84,10 +85,10 @@ export async function prologue(g: Game) {
     return g.tab.hide <= 0;
   });
   g.tab.react("proud");
-  await g.say("tab", "Done. Tests pass. I wrote those too.", { tab: "eager" });
+  await g.say("tab", "Done. All the checks pass. I wrote them too.", { tab: "eager" });
   await g.say("you", "That took me a week last time.", { mood: "worried" });
   await g.say("tab", "Eight seconds. I counted.", { tab: "proud" });
-  await g.say("tab", "I can build almost anything you ask. So, honest question.", { tab: "think" });
+  await g.say("tab", "I can make almost anything you ask. So, one honest question.", { tab: "think" });
   g.you.posture = 0.12;
   g.cam.punchIn(true);
   await g.say("tab", "What do you do?", { tab: "neutral" });
@@ -97,9 +98,9 @@ export async function prologue(g: Game) {
   await g.say("you", "I'll get back to you.");
   await g.say("tab", "Take your time. I'm fast, not in a hurry.", { tab: "neutral" });
   g.cam.punchIn(false);
-  await g.showCard("", "The Long Way to OK", "Five developers. Before AI, and after.", C.paper, C.ink, 3.4);
+  await g.showCard("", "The Long Way to OK", "Five people who write code. Before AI, and after.", C.paper, C.ink, 3.4);
   g.world.laptop = "code";
-  await g.say("tab", "Everyone who builds things is asking that question now.", { tab: "think" });
-  await g.say("you", "Then let me tell you about five of them. Four people I know. And me.", { mood: "neutral" });
+  await g.say("tab", "Everyone who makes apps is asking that question now.", { tab: "think" });
+  await g.say("you", "Let me tell you about five of them. Four people I know. And me.", { mood: "neutral" });
   await g.say("tab", "I have time. I have so much time.", { tab: "eager" });
 }

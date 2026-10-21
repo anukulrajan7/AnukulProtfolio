@@ -42,7 +42,7 @@ export async function finale(g: Game) {
   g.cam.punchIn(true);
   await g.say("tab", "What do you do?", { tab: "neutral" });
   const pieces = KEEPSAKES.filter((k) => g.run.keepsakes.includes(k.id)).map((k) => ({ id: k.id, text: k.piece }));
-  const placed = await g.slot(pieces.length ? "Your answer. Place what you've earned." : "Your answer", pieces, 3);
+  const placed = await g.slot(pieces.length ? "Your answer. Pick what you earned." : "Your answer", pieces, 3);
   const sentence = placed.map((id) => KEEPSAKES.find((k) => k.id === id)!.piece).join(" ") || "I'm still finding out.";
   g.you.setMood("proud");
   g.you.posture = 1;
@@ -61,7 +61,7 @@ export async function finale(g: Game) {
   g.you.gesture("stretch", 2.2);
   await g.wait(3.2);
   g.setGoal(null);
-  await g.showCard("", "Many people left.", "Some because it was too hard. Some because it got too easy. These five stayed, for different reasons.", C.night, C.paper, 4.5);
+  await g.showCard("", "Many people left.", "Some left because it was too hard. Some left because it got too easy. These five stayed, each for a different reason.", C.night, C.paper, 4.5);
   const L = g.run.ledger;
   const mem = loadMemory();
   writeMemory({ ...mem, runs: mem.runs + 1 });

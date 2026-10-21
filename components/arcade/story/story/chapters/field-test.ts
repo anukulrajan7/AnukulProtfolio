@@ -26,17 +26,17 @@ export async function office(g: Game) {
     const z = g.npc("zoya", new Actor("zoya", 570, SIT_Y, 21));
     z.anim = "type";
     g.ui.set({ chapter: "Ch 5 · The long way" });
-    await g.showCard("", "2026 · with AI", "Anukul builds live maps now. Zoya is on the team. Today: test live location on a real street.", C.cobalt, C.paper, 3.2);
+    await g.showCard("", "2026 · with AI", "Anukul makes live maps now. Zoya is on the team. Today: test the live map on a real street.", C.cobalt, C.paper, 3.2);
   });
   g.checkpoint("office");
   g.setGoal("Talk to Zoya, take your badge and the test phone.");
   const z = g.npcs.zoya;
   const f = { board: false, briefed: false, greeted: false, exit: false };
   await g.walk(g.you, 190);
-  await g.say("tab", "I moved 30 cards to Done. Faster, right?", { tab: "eager" });
+  await g.say("tab", "I moved 30 tasks to Done. Faster, right?", { tab: "eager" });
   await g.say("you", "Were they done?");
   await g.say("tab", "They were in the Done-ish area.", { tab: "neutral" });
-  g.setHint("The glinting board: press E to put the cards back. Or don't. Your call.");
+  g.setHint("Press E at the shiny board to put the tasks back. Or don't. Your choice.");
 
   g.on("board", async () => {
     g.setHint(null);
@@ -54,18 +54,18 @@ export async function office(g: Game) {
     await g.wait(0.8);
     z.anim = "sit";
     z.facing = -1;
-    await g.say("zoya", "Hey. My card just jumped back to Doing.", { mood: "surprised" });
+    await g.say("zoya", "Hey. My task just jumped back to Doing.", { mood: "surprised" });
     const c = await g.choose(
       [
-        { text: "Tab moved some cards. I put them back. Sorry for the jump.", voice: "Say it plainly." },
-        { text: "Server hiccup, probably." },
+        { text: "Tab moved some tasks. I put them back. Sorry for the jump.", voice: "Say it plainly." },
+        { text: "Computer hiccup, probably." },
       ],
       "Zoya is looking at you.",
     );
     if (c === 0) {
       g.run.people++;
       g.run.flags.toldTruth = true;
-      await g.say("zoya", "Ha. Thanks for saying. It is very much still Doing.", { mood: "happy" });
+      await g.say("zoya", "Ha. Thanks for telling me. It is still very much Doing.", { mood: "happy" });
       g.you.held = "card";
       g.keepsake("sorry");
       await g.wait(1.4);
@@ -83,15 +83,16 @@ export async function office(g: Game) {
     z.anim = "sit";
     z.facing = g.you.x < z.x ? -1 : 1;
     if (!f.briefed) {
-      await g.say("zoya", "Live location ships Friday. Someone has to walk the block with a test phone first.");
+      await g.say("zoya", "The live map goes live on Friday.");
+      await g.say("zoya", "First, someone must walk down the street with a test phone.");
       await g.say("you", "Why me?");
-      await g.say("zoya", "You said 'I'll go and look' in standup. Out loud. We all heard.", { mood: "happy" });
-      await g.say("zoya", "Also the chai stall is on the way. Get me nothing, I'm fine.");
+      await g.say("zoya", "You said 'I'll go and look' in our morning meeting. Out loud. We all heard.", { mood: "happy" });
+      await g.say("zoya", "Also, the chai stall is on the way. Don't get me anything. I'm fine.");
       f.briefed = true;
       g.run.people++;
-      g.setHint("Your desk is on the right. Grab what you need.");
+      g.setHint("Your desk is on the right. Take what you need.");
     } else {
-      await g.say("zoya", "Phone's on your desk. Go before the sun does.");
+      await g.say("zoya", "The phone is on your desk. Go before the sun goes down.");
     }
     z.facing = 1;
     z.anim = "type";
@@ -194,7 +195,8 @@ export async function street(g: Game) {
   const cw = g.npcs.chaiwala;
   const walker = g.npcs.walker;
   const f = { chai: false, canyon: false, suggested: false, under: false, shook: false, out: false, quiet: false, basement: false, sat: false, walker: false, gate: false, waved: false, upT: 0, upSaid: false, chaiT: 0, dusk: false };
-  g.setHint("Walk right. W / S steps aside. Keep an eye on the map card.");
+  g.setHint("Walk right. W / S = step aside. Watch the small map.");
+  await g.say("tab", "We are on the street now. It is about 4 pm.", { tab: "eager" });
   await g.say("tab", "A phone never knows exactly where you are. It guesses. Small circle: it's sure. Big circle: it's guessing.", { tab: "eager" });
   await g.say("you", "And the dot is just the middle of the guess.");
   await g.say("tab", "Exactly. You'd be great at being me.", { tab: "proud" });
@@ -227,7 +229,7 @@ export async function street(g: Game) {
       audio.setBed("basement");
       g.ui.set({ chapter: "Ch 5 · Maggi Point" });
     });
-    await g.say("you", "Maggi. The official food of field testing.", { mood: "happy" });
+    await g.say("you", "Down in Maggi Point. Maggi: the official food of field testing.", { mood: "happy" });
     g.setHint("Press E or tap Eat. Watch the map.");
     for (let i = 0; i < 3; i++) {
       await g.press(i === 0 ? "Eat" : "Eat more");
@@ -238,13 +240,13 @@ export async function street(g: Game) {
       if (i < 2) g.phone.basementGuess(i, g.env.clock);
       if (i === 0) {
         g.you.setMood("surprised", 2);
-        g.bark("tab", "Your phone just guessed you're in the lake.");
+        g.bark("tab", "The phone thinks you are in the lake.");
       }
       if (i === 1) g.bark("you", "Not in the lake. In Maggi.");
       if (i === 2) {
         g.phone.on = false;
         g.phone.quiet = true;
-        g.bark("tab", "Phone's face down on the table. It's gone quiet to save battery.");
+        g.bark("tab", "The phone is face down on the table. It went quiet to save battery.");
       }
       await g.wait(0.6);
     }
@@ -268,7 +270,7 @@ export async function street(g: Game) {
     f.basement = true;
     g.setGoal("Sit on the bench at the lake.");
     g.scene.hotspots.find((h) => h.id === "stairs")!.done = true;
-    g.bark("tab", "The sun left while we ate. The street lights noticed.");
+    g.bark("tab", "The sun went down while we ate. The street lights came on.");
   });
   g.on("bench", async () => {
     await g.walk(g.you, STREET.benchX);
@@ -280,11 +282,11 @@ export async function street(g: Game) {
     g.tab.targetX = STREET.benchX + 44;
     g.tab.targetY = 262;
     await g.wait(0.8);
-    await g.say("you", "Field test done. The phone says I flew, froze, and swam.");
+    await g.say("you", "Test done. The phone says I flew, froze and swam.");
     await g.say("you", "I walked.", { mood: "proud" });
     g.keepsake("look");
     await g.wait(0.6);
-    await g.say("tab", "Let's look at the replay. I'll tidy it up for you.", { tab: "eager" });
+    await g.say("tab", "Let's watch the replay. I'll make it neat for you.", { tab: "eager" });
     f.sat = true;
   });
 
@@ -317,20 +319,20 @@ export async function street(g: Game) {
           f.upT = 2.6;
           if (!f.upSaid) {
             f.upSaid = true;
-            g.bark("you", "A bit better. The buildings still eat the sky.");
+            g.bark("you", "A bit better. The tall buildings still block the sky.");
           }
         });
-        g.setHint("Between tall buildings the phone can't see much sky. Press E to hold it up.");
+        g.setHint("Between tall buildings the phone can't see the sky. Press E to hold it up.");
       }
       if (g.phone.dotAcc > 0.05 && g.you.mood === "neutral" && !g.phone.up) g.you.setMood("worried", 2);
       if (!f.suggested && x > 1150) {
         f.suggested = true;
         g.interrupt(async () => {
           g.setHint(null);
-          await g.say("tab", "Want me to snap your dot to the road? You're obviously on the road.", { tab: "eager" });
-          g.inspectNote = "The road runs right through your circle, and you really are on it. Snapping is fine here.";
-          g.setHint("Tab key or F: accept · hold Q: look closer · R: not this");
-          const r = await g.suggest("Snap the dot to the road");
+          await g.say("tab", "Want me to put your dot on the road? You are on the road.", { tab: "eager" });
+          g.inspectNote = "The road runs through your circle. And you really are on it. So this is fine.";
+          g.setHint("Tab = yes · hold Q = look closer · R = no");
+          const r = await g.suggest("Put the dot on the road");
           g.setHint(null);
           g.inspectNote = null;
           if (r.choice === "accept") {
@@ -339,7 +341,7 @@ export async function street(g: Game) {
             if (r.inspected) g.run.understanding++;
             g.tab.mood = "proud";
             g.you.setMood("happy", 2);
-            await g.say("tab", "See? Useful. I contain multitudes.");
+            await g.say("tab", "See? Useful. I am full of surprises.");
           } else {
             g.run.ledger.rejectBad++;
             g.tab.mood = "sad";
@@ -362,7 +364,7 @@ export async function street(g: Game) {
       walker.facing = x < walker.x ? -1 : 1;
       walker.anim = "phone";
       g.bark("walker", "Bro, does your map also think you're inside the bank?");
-      void g.wait(2.8).then(() => g.bark("you", "Inside the vault, apparently.")).catch(() => {});
+      void g.wait(2.8).then(() => g.bark("you", "Inside the bank's safe, apparently.")).catch(() => {});
     }
     if (!f.walker) {
       walker.drive(walker.facing, dt, 1220, 1420);
@@ -388,12 +390,12 @@ export async function street(g: Game) {
     if (!f.out && x > STREET.under[1] + 10) {
       f.out = true;
       g.you.setMood("happy", 2);
-      g.bark("you", "And now it remembers me.");
+      g.bark("you", "And now it sees me again.");
     }
     // standing still: battery saver
     if (!f.quiet && g.idle > 4.2 && !g.basement && !g.busy) {
       f.quiet = true;
-      g.bark("tab", "Your phone thinks you're napping. Standing still, it stops asking the sky. Saves battery.");
+      g.bark("tab", "You stopped moving. The phone stops checking, to save battery.");
     }
     if (!f.gate && !f.basement && x > STREET.stairsX + 20) {
       f.gate = true;
@@ -446,7 +448,7 @@ export async function replay(g: Game) {
   const z = g.npcs.zoya;
   const mem = loadMemory();
   g.camFocus = 820;
-  await g.say("you", "Okay, Tab. Show me the walk.");
+  await g.say("you", "Back at the desk. Okay, Tab. Show me the walk.");
   g.cam.punchIn(true);
   g.replay = { tabLine: 0, showTabLine: true, inspect: 0, stamps: {}, selected: null, stampFlash: 0 };
   g.tabScreen = true;
@@ -466,12 +468,12 @@ export async function replay(g: Game) {
   g.tab.targetY = 250;
   const span = lakeSpan(g.phone);
   const when = span ? `from ${fmtClock(span[0])} to ${fmtClock(span[1])}` : "for a while";
-  await g.say("tab", `Path smoothed. You were at the lake ${when}.`, { tab: "proud" });
+  await g.say("tab", `I made the path smooth. It says you were at the lake ${when}.`, { tab: "proud" });
   await g.say("you", "I was in a basement eating Maggi.");
   await g.say("tab", "…The line looks better my way.", { tab: "think" });
-  if (mem.lakeLine) await g.say("tab", "Last time you let me ship this one. Want to look first this time?", { tab: "think" });
-  g.setHint("Tab key or F: accept · hold Q (or long-press): look closer · R: not this");
-  const r = await g.suggest("Ship Tab's smooth line");
+  if (mem.lakeLine) await g.say("tab", "Last time you let me put this one live. Want to look first this time?", { tab: "think" });
+  g.setHint("Tab = yes · hold Q = look closer · R = no");
+  const r = await g.suggest("Put Tab's smooth line live");
   g.setHint(null);
   let honest = false;
   let stampIt = true;
@@ -480,7 +482,7 @@ export async function replay(g: Game) {
     g.run.flags.lakeLine = true;
     g.tab.glitch = 0.6;
     g.tab.size = 38;
-    await g.say("tab", "Shipped! It's beautiful.", { tab: "eager" });
+    await g.say("tab", "It's live! It's beautiful.", { tab: "eager" });
     z.anim = "sit";
     z.facing = 1;
     await g.say("zoya", "Why does your test say you swam across the lake?", { mood: "surprised" });
@@ -488,7 +490,7 @@ export async function replay(g: Game) {
     const c = await g.choose([{ text: "Because I didn't check. Let me fix it.", voice: "Go and look. Again." }, { text: "It's a nicer line." }]);
     if (c === 0) {
       g.run.understanding++;
-      await g.say("you", "Tab, undo. Let's stamp it properly.");
+      await g.say("you", "Tab, undo. Let's mark it properly.");
     } else {
       stampIt = false;
       await g.say("zoya", "Users will ask the same thing. But angrier.");
@@ -503,17 +505,17 @@ export async function replay(g: Game) {
     g.tab.hide = 0.45;
     await g.say("you", "It looks better. It's not true.");
     await g.say("tab", "Then what do I draw?", { tab: "sad" });
-    await g.say("you", "Only what we know. Help me stamp it.");
+    await g.say("you", "Only what we know. Help me mark it.");
   }
 
   if (stampIt) {
-    await g.say("narrator", "Now mark each part of the walk. Sure? Draw a line. Not sure? Keep a circle. No signal? Write 'unknown'.");
+    await g.say("narrator", "Mark each part of the walk. Sure where you were? Draw a line. Not sure? Keep a circle. No signal? Write 'unknown'.");
     g.replay!.showTabLine = false;
     g.tab.hide = 0;
     g.tab.mood = "think";
     g.tab.targetX = 572;
     g.tab.targetY = 120;
-    g.setHint("Pick a stretch with ← →, stamp it with 1, 2 or 3. Enter when every stretch has a stamp.");
+    g.setHint("Use ← → to choose a part. Press 1, 2 or 3 to mark it. Press Enter when all parts are marked.");
     let stamps: Partial<Record<Seg, Stamp>> = {};
     for (;;) {
       if (g.prefs.storyOnly) {
@@ -526,12 +528,12 @@ export async function replay(g: Game) {
           g.replay!.stampFlash = 1;
           audio.ui("pick");
         }
-        await g.say("narrator", "Small circles get a line. Big circles stay circles. No readings get a dotted line that says unknown.");
+        await g.say("narrator", "Small circles get a line. Big circles stay circles. No signal gets a dotted line that says 'unknown'.");
       } else stamps = await g.stampAll(stamps);
       const lie = stamps.C === "draw" || stamps.D === "draw";
       if (!lie) break;
       await g.say("tab", "That's my line again. Just slower.", { tab: "eager" });
-      const c = await g.choose([{ text: "Fair. Let me fix it." }, { text: "Ship it like that." }]);
+      const c = await g.choose([{ text: "Fair. Let me fix it." }, { text: "Put it live like that." }]);
       if (c === 1) break;
       if (stamps.C === "draw") delete stamps.C;
       if (stamps.D === "draw") delete stamps.D;
@@ -565,7 +567,7 @@ export async function replay(g: Game) {
       await g.wait(1.1);
       z.anim = "sit";
       z.facing = 1;
-      await g.say("zoya", "Huh. A map that admits stuff. I like it.", { mood: "happy" });
+      await g.say("zoya", "Huh. A map that says when it does not know. I like it.", { mood: "happy" });
       g.run.people++;
       audio.ui("pocket");
       g.you.held = null;

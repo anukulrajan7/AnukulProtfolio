@@ -32,20 +32,20 @@ export async function sen(g: Game) {
     g.npc("arjun", new Actor("manager", 160, ROOM_FEET, 71));
     g.ui.set({ chapter: "Ch 2 · All the answers" });
     await chapterCard(g, 2, "Sen", "All the answers");
-    await eraCard(g, "past", "2016 · before AI", "Sen has been coding for ten years. Everyone comes to his desk.");
+    await eraCard(g, "past", "2016 · before AI", "Sen has written code for ten years. Everyone comes to his desk.");
   });
   g.checkpoint("sen");
-  g.setGoal("Help the juniors.");
+  g.setGoal("Help the new coders.");
   const a = g.npcs.arjun;
   await walkIn(g, a, 700);
   a.facing = 1;
   g.you.anim = "sit";
   g.you.facing = -1;
-  await g.say("arjun", "Sen bhaiya, the build is broken.");
+  await g.say("arjun", "Sen bhaiya, the app is broken.");
   await g.say("you", "Line 40. You forgot to wait for the data.");
   const asks: [string, string][] = [
-    ["Sen bhaiya, what's a race condition?", "Two people editing one file at once. Someone loses."],
-    ["Sen bhaiya, the server is down!", "Restart the queue. Then tell me who changed the config."],
+    ["Sen bhaiya, why does it break only sometimes?", "Two things change the same data at once. One of them loses."],
+    ["Sen bhaiya, the server is down!", "Restart it. Then find out who changed the settings."],
     ["Sen bhaiya, chai?", "Always."],
   ];
   g.setHint("Press E or tap Help.");
@@ -56,7 +56,7 @@ export async function sen(g: Game) {
     await g.say("you", answer, { mood: "happy" });
   }
   g.setHint(null);
-  await g.say("narrator", "He knows every bug in this building by heart. It feels good to be needed.");
+  await g.say("narrator", "He knows every mistake in this code by heart. It feels good to be needed.");
 
   // 2026
   await g.transition(C.cobalt, async () => {
@@ -81,19 +81,19 @@ export async function sen(g: Game) {
   const b = g.npcs.arjun;
   await walkIn(g, b, 905);
   b.facing = 1;
-  await g.say("arjun", "Tab, why is the build broken?");
+  await g.say("arjun", "Tab, why is the app broken?");
   await g.say("tab", "Line 40. You forgot to wait for the data.", { tab: "proud" });
   await g.say("arjun", "Thanks, Tab!");
   g.you.posture = 0.45;
   await g.say("you", "That was my line.", { mood: "tired" });
   await g.walk(b, 330);
-  await g.say("narrator", "His old friend Kiran left tech last month. 'The machine knows more than us now,' Kiran said.");
+  await g.say("narrator", "His old friend Kiran quit his tech job last month. 'The machine knows more than us now,' Kiran said.");
 
   const f = { mail: false, review: false };
   stand(g);
   g.you.facing = 1;
   g.tabFollow = true;
-  spots(g, [spot("mail", 858, 186, "Draft email: Resignation"), spot("review", 930, 224, "Tab's big change (needs review)")]);
+  spots(g, [spot("mail", 858, 186, "Draft email: I quit"), spot("review", 930, 224, "Tab's big change (check it first)")]);
   g.on("mail", async () => {
     g.you.facing = 1;
     g.you.gesture("carry", 1.4);
@@ -104,11 +104,11 @@ export async function sen(g: Game) {
     f.mail = true;
   });
   g.on("review", async () => {
-    g.setGoal("Review Tab's change.");
+    g.setGoal("Check Tab's change.");
     g.you.facing = 1;
-    g.setHint("Tab key or F: accept · hold Q: look closer · R: not this");
-    g.inspectNote = "Line 1,412 deletes 'old' users. 'Old' means anyone who joined before 2020. That's half the customers.";
-    const r = await g.suggest("Ship Tab's database clean-up (2,000 lines)");
+    g.setHint("Tab = yes · hold Q = look closer · R = no");
+    g.inspectNote = "Line 1,412 deletes 'old' users. 'Old' means anyone who joined before 2020. That is half our customers.";
+    const r = await g.suggest("Put Tab's data clean-up live (2,000 lines)");
     g.setHint(null);
     g.inspectNote = null;
     if (r.choice === "accept") {
@@ -122,13 +122,13 @@ export async function sen(g: Game) {
       b.facing = -1;
       await g.say("arjun", "Half the users just vanished!", { mood: "surprised" });
       await g.say("you", "Undo. Now. …I should have read it.", { mood: "worried" });
-      await g.say("narrator", "They restore it.");
+      await g.say("narrator", "They bring the users back.");
       g.world.monitor = "ok";
       g.tab.mood = "sad";
     } else {
       g.run.ledger.rejectGood++;
       if (r.inspected) g.run.understanding++;
-      await g.say("you", "Line 1,412. You'd delete half our customers.", { mood: "proud" });
+      await g.say("you", "Line 1,412. You would delete half our customers.", { mood: "proud" });
       await g.say("tab", "…How did you see that so fast?", { tab: "think" });
       await g.say("you", "Ten years of breaking things.", { mood: "happy" });
     }

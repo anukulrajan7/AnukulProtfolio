@@ -28,13 +28,13 @@ export async function ravi(g: Game) {
     g.you.setMood("tired");
     g.ui.set({ chapter: "Ch 3 · The one who left" });
     await chapterCard(g, 3, "Ravi", "The one who left");
-    await eraCard(g, "past", "2020 · before AI", "Ravi is a developer. It's his third 2 am this week.");
+    await eraCard(g, "past", "2020 · before AI", "Ravi writes code. It is 2 am, the third night this week.");
   });
   g.checkpoint("ravi");
   g.setGoal("Fix the server. Again.");
   g.you.anim = "type";
   const nights: [number, string][] = [
-    [2 * 60 + 4, "2:04 am. Server down."],
+    [2 * 60 + 4, "2:04 am. The server is down."],
     [2 * 60 + 51, "2:51 am. Down again."],
     [3 * 60 + 30, "3:30 am. Down again."],
   ];
@@ -52,11 +52,11 @@ export async function ravi(g: Game) {
   g.you.setMood("tired");
   await g.say("narrator", "His dad calls. 'Beta, the shop needs help. And you sound tired.'");
   const c = await g.choose([{ text: "Quit. Help Dad's shop." }, { text: "Stay one more year." }]);
-  if (c === 1) await g.say("narrator", "He stays one more year. It doesn't get better.");
+  if (c === 1) await g.say("narrator", "He stays one more year. It does not get better.");
   await g.press("Close the laptop");
   g.world.laptop = "dark";
   audio.ui("pocket");
-  await g.say("narrator", "Ravi left tech in 2020. He didn't write code for five years.");
+  await g.say("narrator", "Ravi left tech work in 2020. He did not write code for five years.");
 
   // 2026: the chai stall
   await g.transition(C.cobalt, async () => {
@@ -88,14 +88,14 @@ export async function ravi(g: Game) {
   cust.facing = 1;
   await g.say("customer", "Bhaiya, you charged me two times!");
   g.setGoal("Fix the double bill.");
-  g.setHint("Tab key or F: accept · hold Q: look closer · R: not this");
-  g.inspectNote = "A wait only hides it. The real bug: every tap on Pay sends a new bill.";
+  g.setHint("Tab = yes · hold Q = look closer · R = no");
+  g.inspectNote = "Waiting only hides the problem. The real bug: every tap on Pay makes a new bill.";
   const r = await g.suggest("Copy Tab's fix: add a 2-second wait");
   g.setHint(null);
   g.inspectNote = null;
   if (r.choice === "accept") {
     g.run.ledger.acceptBad++;
-    await g.say("narrator", "The next customer taps three times and is charged three times.");
+    await g.say("narrator", "The next customer taps three times. He gets three bills.");
     await g.say("you", "Okay. Tab, explain it. Plain words.", { mood: "worried" });
   } else {
     g.run.ledger.rejectGood++;
@@ -106,8 +106,8 @@ export async function ravi(g: Game) {
   await g.say("tab", "If someone taps Pay twice, I send two bills.", { tab: "think" });
   await g.say("you", "So, one bill per order. Even if they tap ten times.", { mood: "proud" });
   await g.say("tab", "…That's better than mine.", { tab: "sad" });
-  await g.say("you", "I left because it was too much. Now it's fast. But I still need to know why.");
+  await g.say("you", "I left because it was too much. Now it is fast. But I still need to know why.");
   await g.say("dad", "Beta, you look happy. First time in years.", { mood: "happy" });
-  await g.say("narrator", "Ravi took small coding jobs again. Daytime only.");
+  await g.say("narrator", "Ravi took small coding jobs again. Only in the day.");
   await giveKeepsake(g, "why");
 }

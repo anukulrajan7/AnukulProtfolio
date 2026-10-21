@@ -529,3 +529,37 @@
 .lw[data-compact="1"] .lw-slot svg { width: 13px; height: 13px; }
 .lw[data-compact="1"] .lw-hbtn { height: 30px; padding: 0 7px; font-size: 11.5px; border-radius: 8px; }
 .lw[data-compact="1"] .lw-hud-right { gap: 4px; }
+
+.lw-pick-card { max-width: 560px; }
+.lw-pick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 8px; }
+.lw-pick-item {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+  text-align: left;
+  padding: 8px 16px;
+  border: 2px solid var(--lw-ink);
+  border-radius: 12px;
+  background: var(--lw-paper);
+  color: var(--lw-ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.lw-pick-item:hover { transform: translateY(-2px); box-shadow: 0 4px 0 var(--lw-ink); }
+.lw-pick-item:focus-visible,
+.lw-btn:focus-visible { outline: 3px solid var(--lw-cobalt); outline-offset: 2px; }
+.lw-pick-name { font-family: var(--font-display); font-weight: 800; font-size: 20px; }
+.lw-pick-years { font-size: 13px; color: var(--lw-muted); }
+.lw-pick-line { font-size: 14px; font-weight: 500; }
+.lw-pick-done { font-size: 13px; font-weight: 700; padding: 0 8px; background: var(--lw-mint); border-radius: 8px; }
+.lw-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+/* phone: two columns, small type, so all five people fit without scrolling */
+.lw[data-compact="1"] .lw-pick-grid { grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px; }
+.lw[data-compact="1"] .lw-pick-item { padding: 4px 8px; gap: 0; border-radius: 8px; }
+.lw[data-compact="1"] .lw-pick-name { font-size: 15px; }
+.lw[data-compact="1"] .lw-pick-years,
+.lw[data-compact="1"] .lw-pick-line,
+.lw[data-compact="1"] .lw-pick-done { font-size: 11px; }
+.lw[data-compact="1"] .lw-pick-card .lw-modal-h { font-size: 20px; margin: 0; order: -2; }
+/* keep "Play the whole story" visible above the cards on small screens */
+.lw[data-compact="1"] .lw-pick-card { display: flex; flex-direction: column; }
+.lw[data-compact="1"] .lw-pick-card .lw-title-actions { order: -1; margin-top: 4px; }

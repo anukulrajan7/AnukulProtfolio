@@ -18,11 +18,11 @@ export interface Fix {
 }
 
 export const SEGS: { id: Seg; name: string; hint: string; good: Stamp[] }[] = [
-  { id: "A", name: "Office to the chai stall", hint: "small circles, steady", good: ["draw"] },
-  { id: "B", name: "Between the tall buildings", hint: "big circles, wandering", good: ["keep"] },
-  { id: "C", name: "Under the flyover", hint: "no readings at all", good: ["unknown"] },
-  { id: "D", name: "Maggi basement", hint: "two wild guesses, then quiet", good: ["unknown", "keep"] },
-  { id: "E", name: "Along the lake", hint: "small circles, steady", good: ["draw"] },
+  { id: "A", name: "Office to the chai stall", hint: "Here the phone could see the sky. Sure.", good: ["draw"] },
+  { id: "B", name: "Between the tall buildings", hint: "Tall buildings hid the sky. The phone was not sure.", good: ["keep"] },
+  { id: "C", name: "Under the road bridge", hint: "No signal at all. The phone knew nothing.", good: ["unknown"] },
+  { id: "D", name: "Maggi basement", hint: "Indoors. Two wild guesses, then the phone went quiet.", good: ["unknown", "keep"] },
+  { id: "E", name: "Along the lake", hint: "The sky was open again. Sure.", good: ["draw"] },
 ];
 
 const ROUTE: Pt[] = [
@@ -184,7 +184,7 @@ function accCircle(ctx: CanvasRenderingContext2D, x: number, y: number, r: numbe
 
 export function drawMiniMap(ctx: CanvasRenderingContext2D, phone: Phone, clock: number, x: number, y: number, w: number, h: number, t: number) {
   card(ctx, x, y, w, h, 400);
-  label(ctx, "LIVE LOCATION · TEST", x + 8, y + 10, { size: 7, font: "display", weight: 800 });
+  label(ctx, "LIVE MAP · TEST", x + 8, y + 10, { size: 7, font: "display", weight: 800 });
   label(ctx, fmtClock(clock) + " pm", x + w - 8, y + 10, { size: 7, font: "mono", align: "right" });
   const mx = x + 6;
   const my = y + 18;
@@ -217,10 +217,10 @@ export function drawMiniMap(ctx: CanvasRenderingContext2D, phone: Phone, clock: 
   inkCircle(ctx, 401, dx, dy, 3.5, { fill: phone.frozen || phone.quiet ? C.paper : C.cobalt, stroke: C.ink, lw: 1.5 });
   ctx.restore();
   // status line
-  let status = phone.dotAcc < 0.04 ? "small circle · trust it" : "big circle · drifting";
-  if (phone.frozen) status = `frozen · last fix ${Math.floor(phone.sinceFix)}s ago`;
-  else if (phone.quiet) status = "zz · quiet to save battery";
-  else if (phone.snap && phone.dotAcc >= 0.04) status = "snapped to road";
+  let status = phone.dotAcc < 0.04 ? "small circle · sure" : "big circle · not sure";
+  if (phone.frozen) status = `stuck · last update ${Math.floor(phone.sinceFix)}s ago`;
+  else if (phone.quiet) status = "zz · resting to save battery";
+  else if (phone.snap && phone.dotAcc >= 0.04) status = "put on the road";
   const blink = phone.frozen && Math.floor(t * 2) % 2 === 0;
   inkRect(ctx, 402, x + 6, y + h - 14, w - 12, 11, 3, { fill: phone.frozen || phone.quiet ? C.sun : C.surface, stroke: null });
   if (!blink) label(ctx, status, x + w / 2, y + h - 8.5, { size: 6.5, font: "mono", align: "center" });
@@ -385,10 +385,10 @@ export function drawReplay(ctx: CanvasRenderingContext2D, phone: Phone, v: Repla
     const gap = ends("C");
     if (gap) {
       zigzag(ctx, gap[0], gap[1]);
-      label(ctx, "no readings", (gap[0][0] + gap[1][0]) / 2, (gap[0][1] + gap[1][1]) / 2 - 16, { size: 8.5, font: "hand", weight: 700, align: "center", color: C.coralText });
+      label(ctx, "no signal", (gap[0][0] + gap[1][0]) / 2, (gap[0][1] + gap[1][1]) / 2 - 16, { size: 8.5, font: "hand", weight: 700, align: "center", color: C.coralText });
     }
     label(ctx, "huge circles: a guess from indoors", X(LAKE.cx), Y(LAKE.cy - LAKE.ry - 0.05), { size: 8, font: "hand", weight: 700, align: "center", color: C.coralText });
-    label(ctx, "then quiet: phone asleep on a table", X(BASEMENT[0]) + 8, Y(BASEMENT[1] + 0.16), { size: 8.5, font: "hand", weight: 700, align: "center", color: C.coralText });
+    label(ctx, "then nothing: phone asleep on a table", X(BASEMENT[0]) + 8, Y(BASEMENT[1] + 0.16), { size: 8.5, font: "hand", weight: 700, align: "center", color: C.coralText });
     ctx.restore();
   }
 

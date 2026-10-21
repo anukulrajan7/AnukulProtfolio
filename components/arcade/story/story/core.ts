@@ -8,7 +8,7 @@ import { Loop } from "../engine/loop";
 import { C, H, W } from "../engine/palette";
 import { Actor, Tab, type Mood, type TabMood } from "../engine/rig";
 import { clamp, damp, lerp } from "../engine/rng";
-import { defaultPrefs, writePrefs, writeSave, type Prefs } from "../engine/save";
+import { defaultPrefs, PERSON_IDS, recordMemory, writePrefs, writeSave, type Prefs } from "../engine/save";
 import { Stage } from "../engine/stage";
 import { createStore, type Store } from "../engine/store";
 import { drawMiniMap, drawReplay, Phone, SEGS, type ReplayView, type Seg, type Stamp } from "../world/map";
@@ -98,6 +98,8 @@ export class Game {
   private pointerDown: { x: number; y: number; t: number; id: number } | null = null;
   els: { bubble?: HTMLElement | null; prompt?: HTMLElement | null } = {};
   checkpointId = "prologue";
+  /** Person id while playing one person's story; undefined for the whole story. */
+  only: string | undefined = undefined;
   private touchMoved = false;
   /** Ignore keys briefly when a decision appears, so a double-tap on a line can't skip it. */
   private guardUntil = 0;
@@ -526,6 +528,7 @@ export class Game {
   keepsake(id: string) {
     if (this.run.keepsakes.includes(id)) return;
     this.run.keepsakes.push(id);
+    recordMemory([], [id]);
     audio.ui("keepsake");
     this.ui.set({ keepsakes: [...this.run.keepsakes], newKeepsake: id });
     const end = this.time + 3.2;
@@ -536,6 +539,7 @@ export class Game {
 
   checkpoint(id: string) {
     this.checkpointId = id;
+    if (id === "done" && !this.only) recordMemory(PERSON_IDS, this.run.keepsakes);
     writeSave({
       v: 3,
       chapter: chapterOf(id),
@@ -551,6 +555,7 @@ export class Game {
       runs: 0,
       finished: id === "done",
       updatedAt: Date.now(),
+      only: this.only,
       fixes: id === "replay" || id === "finale" ? this.phone.fixes : undefined,
     });
     this.ui.set({ hasSave: true });
@@ -657,7 +662,7 @@ export class Game {
       if (!ui.paused) (document.activeElement as HTMLElement | null)?.blur?.();
       return;
     }
-    if (ui.paused || ui.screen === "title") {
+    if (ui.paused || ui.screen === "title" || ui.screen === "pick") {
       this.idleTitle(dt);
       return;
     }
@@ -974,7 +979,7 @@ export class Game {
     ctx.strokeStyle = C.ink;
     ctx.lineWidth = 2;
     ctx.strokeRect(7, 7, W - 14, H - 14);
-    if (text) label(ctx, "INSPECTING · Q", 18, 20, { size: 9, font: "display", weight: 800, color: C.ink });
+    if (text) label(ctx, "LOOKING CLOSER · Q", 18, 20, { size: 9, font: "display", weight: 800, color: C.ink });
     ctx.restore();
   }
 

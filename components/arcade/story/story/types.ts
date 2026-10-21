@@ -45,6 +45,14 @@ export const KEEPSAKES: KeepsakeDef[] = [
 ];
 export const SHELF_SLOTS = 8;
 
+export const PEOPLE = [
+  { id: "meera", name: "Meera", years: "2018 → 2026", line: "Started coding late" },
+  { id: "sen", name: "Sen", years: "2016 → 2026", line: "The senior everyone asked" },
+  { id: "ravi", name: "Ravi", years: "2020 → 2026", line: "Left, then came back" },
+  { id: "zoya", name: "Zoya", years: "2026", line: "Never coded without AI" },
+  { id: "anukul", name: "Anukul", years: "2019 → 2026", line: "Me" },
+] as const;
+
 export interface BubbleUi {
   id: number;
   who: Who;
@@ -101,7 +109,7 @@ export interface EndUi {
 }
 
 export interface Ui {
-  screen: "title" | "play" | "end";
+  screen: "title" | "pick" | "play" | "end";
   chapter: string;
   goal: string | null;
   bubble: BubbleUi | null;

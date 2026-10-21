@@ -9,16 +9,39 @@ import { prologue } from "./chapters/prologue";
 import { ravi } from "./chapters/ravi";
 import { sen } from "./chapters/sen";
 import { zoya } from "./chapters/zoya";
+import { clearSave, recordMemory } from "../engine/save";
 import { Abort, type Game } from "./core";
+import { PEOPLE } from "./types";
+import { C } from "../engine/palette";
 
 export const CHECKPOINTS = ["prologue", "meera", "sen", "ravi", "zoya", "anukul", "office", "street", "replay", "finale"] as const;
 export type Checkpoint = (typeof CHECKPOINTS)[number];
 
-export async function runSlice(g: Game, from: string) {
+export const GROUPS: Record<string, Checkpoint[]> = {
+  meera: ["meera"],
+  sen: ["sen"],
+  ravi: ["ravi"],
+  zoya: ["zoya"],
+  anukul: ["anukul", "office", "street", "replay"],
+};
+
+export async function runSlice(g: Game, from: string, only?: string) {
+  g.only = only;
+  const group = only ? GROUPS[only] : undefined;
+  const last = group ? CHECKPOINTS.indexOf(group[group.length - 1]) : CHECKPOINTS.length - 1;
   const steps: Record<Checkpoint, (g: Game) => Promise<void>> = { prologue, meera, sen, ravi, zoya, anukul, office, street, replay, finale };
   let i = Math.max(0, CHECKPOINTS.indexOf(from as Checkpoint));
   try {
-    for (; i < CHECKPOINTS.length; i++) await steps[CHECKPOINTS[i]](g);
+    for (; i <= last; i++) await steps[CHECKPOINTS[i]](g);
+    if (only) {
+      recordMemory([only], g.run.keepsakes);
+      clearSave();
+      g.ui.set({ hasSave: false });
+      const name = PEOPLE.find((p) => p.id === only)?.name ?? "";
+      await g.showCard("", `${name}'s story is done.`, "Pick another person, or play the whole story.", C.ink, C.paper, 2.6);
+      g.resetScripts();
+      g.ui.set({ screen: "pick", card: null, paused: false });
+    }
   } catch (e) {
     if (!(e instanceof Abort)) console.error(e);
   }

@@ -32,7 +32,8 @@ export async function meera(g: Game) {
   g.checkpoint("meera");
   g.setGoal("Finish the video lesson before your son wakes up.");
   const f = { laptop: false };
-  await g.say("narrator", "11:40 pm. The bank job ends at 6. The real work starts now.");
+  await g.say("narrator", "It is 11:40 at night, in 2018.");
+  await g.say("narrator", "Meera's bank job ended at 6. Her real work starts now.");
   g.on("bed", async () => {
     g.you.facing = -1;
     g.bark("you", "Sleeping. Good.");
@@ -65,9 +66,9 @@ export async function meera(g: Game) {
   if (c === 0) {
     g.run.understanding++;
     g.you.gesture("carry", 1.2);
-    await g.say("narrator", "Meera writes on a sticky note: 'Closure = a function that remembers.'");
+    await g.say("narrator", "Meera writes on a sticky note: 'Closure = code that remembers.'");
   } else {
-    await g.say("narrator", "It doesn't make sense. She rewinds anyway.");
+    await g.say("narrator", "She does not understand. She rewinds anyway.");
   }
 
   // eight months later: the inbox
@@ -78,14 +79,15 @@ export async function meera(g: Game) {
     await g.showCard("", "Eight months later", "", C.paper, C.ink, 2);
   });
   g.setGoal("Read your emails.");
-  const mails = ["We regret to inform you…", "We have decided to move ahead with other candidates.", "You don't have a computer science degree, so…"];
+  const mails = ["We are sorry to tell you…", "We chose other people for this job.", "You have no computer degree, so…"];
   for (const m of mails) {
     await g.press("Open email");
     audio.ui("buzz");
     await g.say("narrator", m);
   }
   await g.say("narrator", "Forty applications. Forty no's.");
-  await g.say("narrator", "Her friend from the course sends a message: 'I'm stopping. Too old for this. All the best.'");
+  await g.say("narrator", "A friend from her course sends a message.");
+  await g.say("narrator", "'I'm stopping. Too old for this. Good luck.'");
   const send = await g.choose([{ text: "Send application 41" }, { text: "Close the laptop" }]);
   if (send === 1) {
     g.world.laptop = "dark";
@@ -116,15 +118,15 @@ export async function meera(g: Game) {
     g.ui.set({ chapter: "Ch 1 · The late start" });
     await eraCard(g, "ai", "2026 · with AI", "Meera is a developer now. The office is quieter than before.");
   });
-  g.setGoal("Finish today's tickets.");
+  g.setGoal("Finish today's tasks.");
   const b = g.npcs.boss;
-  await g.say("tab", "I finished your six tickets. And the team's. Want me to take next week too?", { tab: "eager" });
+  await g.say("tab", "I finished your six tasks. And the team's tasks too. Want next week's too?", { tab: "eager" });
   await walkIn(g, b, 700);
   b.facing = 1;
-  await g.say("boss", "Meera, we're not hiring juniors this year. Tab does the junior work now.");
+  await g.say("boss", "Meera, we are not hiring beginners this year. Tab does the beginner work now.");
   g.you.anim = "sit";
   g.you.facing = -1;
-  await g.say("you", "I was a junior three years ago.", { mood: "worried" });
+  await g.say("you", "I was a beginner three years ago.", { mood: "worried" });
   await g.say("boss", "I know. That's why I'm telling you first.");
   await g.say("narrator", "Two people on her team left that month.");
   await g.walk(b, 940);
@@ -133,8 +135,8 @@ export async function meera(g: Game) {
   g.you.anim = "type";
 
   g.setGoal("Find out why customers are angry.");
-  g.setHint("Tab key or F: accept · hold Q: look closer · R: not this");
-  g.inspectNote = "Tab only read the complaint report. Nobody talked to a customer.";
+  g.setHint("Tab = yes · hold Q = look closer · R = no");
+  g.inspectNote = "Tab only read the list of complaints. Nobody talked to a customer.";
   const r = await g.suggest("Tab's fix: make the Pay button bigger");
   g.setHint(null);
   g.inspectNote = null;
@@ -152,10 +154,10 @@ export async function meera(g: Game) {
   await g.press("Call a customer");
   g.you.held = "phone";
   g.you.gesture("phone", 1.4);
-  await g.say("customer", "It's not the button, beta. I'm 60. I can't read that small grey text.");
+  await g.say("customer", "It's not the button, beta. I am 60. I can't read this small grey writing.");
   g.you.held = null;
   g.you.anim = "type";
-  await g.say("you", "Nobody asked them. Not the old way. Not the new way.");
+  await g.say("you", "Nobody asked them. Not in the old days. Not now.");
   await g.say("you", "Tab, make the text big and dark.");
   await g.say("tab", "Oh. Nobody wrote that down anywhere.", { tab: "think" });
   await g.say("you", "That's my job. I go and ask.", { mood: "proud" });
