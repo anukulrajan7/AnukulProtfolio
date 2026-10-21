@@ -1,12 +1,12 @@
-// arcade:story:v2 save + prefs. The old arcade:story:v1 is ignored.
+// arcade:story:v3 save + prefs. Older saves (v1, v2) are ignored.
 import type { Ledger } from "../story/types";
 import type { Fix } from "../world/map";
 
-export const SAVE_KEY = "arcade:story:v2";
+export const SAVE_KEY = "arcade:story:v3";
 export const PREFS_KEY = "arcade:story:prefs:v2";
 
 export interface SaveData {
-  v: 2;
+  v: 3;
   chapter: string;
   checkpoint: string;
   flags: Record<string, boolean | number | string>;
@@ -43,7 +43,9 @@ export function loadSave(): SaveData | null {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return null;
     const d = JSON.parse(raw) as SaveData;
-    if (d?.v !== 2 || typeof d.checkpoint !== "string") return null;
+    // literal list, not CHECKPOINTS: importing script.ts here would be circular
+    const ids = ["prologue", "meera", "sen", "ravi", "zoya", "anukul", "office", "street", "replay", "finale", "done"];
+    if (d?.v !== 3 || !ids.includes(d.checkpoint) || !Array.isArray(d.keepsakes) || typeof d.ledger !== "object" || typeof d.flags !== "object" || !d.ledger || !d.flags) return null;
     return d;
   } catch {
     return null;

@@ -17,7 +17,7 @@ export interface Env {
 
 /** Mutable bits of the world the script flips and props read every frame. */
 export interface WorldState {
-  laptop: "code" | "build" | "done" | "dark";
+  laptop: "code" | "build" | "done" | "dark" | "lesson" | "line" | "square" | "triangle" | "error" | "mail";
   buildT: number;
   /** 0 = Tab's 30 cards sit in Done, 1 = moved back. */
   boardBack: number;
@@ -28,7 +28,7 @@ export interface WorldState {
   phoneOnDesk: boolean;
   /** Keepsakes shown as objects on the finale desk. */
   deskThings: string[];
-  monitor: "chat" | "map" | "dark";
+  monitor: "chat" | "map" | "dark" | "error" | "ok";
   chaiFull: boolean;
 }
 

@@ -43,6 +43,18 @@ export const ROOM_FEET = 318;
 /** Feet y for someone sitting on a room chair. */
 export const SIT_Y = 289;
 
+/** "past" = warm sepia memory, "early" = a lighter wash (2023), "now" = as drawn. */
+export type Era = "past" | "early" | "now";
+
+function eraWash(ctx: CanvasRenderingContext2D, era: Era, width: number, dark: boolean) {
+  if (era === "now") return;
+  ctx.save();
+  ctx.globalAlpha = era === "past" ? (dark ? 0.2 : 0.14) : dark ? 0.1 : 0.07;
+  ctx.fillStyle = dark ? "#8E6B3A" : "#C9A46A";
+  ctx.fillRect(-20, -20, width + 40, H + 40);
+  ctx.restore();
+}
+
 function room(width: number, wall: string, side: string, floor: string): Prop {
   return prop(0, 0, width, H, (s) => {
     s.rect(-4, -4, width + 8, 38, 0, { fill: "#F7F5F0", stroke: null });
@@ -59,7 +71,7 @@ function room(width: number, wall: string, side: string, floor: string): Prop {
 /* Home desk: prologue + finale. Present day, night.                   */
 /* ------------------------------------------------------------------ */
 
-export function buildHome(): Scene {
+export function buildHome(era: Era = "now"): Scene {
   const width = 960;
   const play: Prop[] = [
     room(width, "#ECE9E1", "#E2DED4", "#DCD6C9"),
@@ -113,7 +125,7 @@ export function buildHome(): Scene {
       h: 30,
       sort: 262,
       draw: (ctx, env) => {
-        env.w.deskThings.forEach((k, i) => deskThing(ctx, k, 444 + i * 22, 256));
+        env.w.deskThings.forEach((k, i) => deskThing(ctx, k, 444 + i * 19, 256));
       },
     },
   ];
@@ -140,6 +152,7 @@ export function buildHome(): Scene {
       ctx.fillRect(0, 0, W, H);
     },
     overlay: (ctx, env) => {
+      eraWash(ctx, era, width, !env.light);
       if (env.light) return;
       ctx.save();
       ctx.globalAlpha = 0.2 * (1 - env.w.dawn);
@@ -176,6 +189,37 @@ function laptopScreen(ctx: CanvasRenderingContext2D, env: Env, x: number, y: num
     ctx.fillRect(x + 8, y + 20, (w - 16) * smooth(Math.min(1, env.w.buildT)), 4);
     return;
   }
+  if (st === "lesson") {
+    inkRect(ctx, 64, x + 4, y + 3, w - 8, 22, 2, { fill: C.card, stroke: C.ink, lw: 1 });
+    inkPoly(ctx, 65, [[x + w / 2 - 3, y + 8], [x + w / 2 - 3, y + 20], [x + w / 2 + 5, y + 14]], { fill: C.paper, stroke: null });
+    inkRect(ctx, 66, x + 4, y + 30, w - 8, 4, 2, { fill: C.paper, stroke: C.ink, lw: 1 });
+    ctx.fillStyle = C.coral;
+    ctx.fillRect(x + 5, y + 31, (w - 10) * Math.min(1, 0.12 + env.w.buildT * 0.7), 2);
+    return;
+  }
+  if (st === "line" || st === "square" || st === "triangle") {
+    const rows = st === "line" ? 1 : 5;
+    for (let r = 0; r < rows; r++) {
+      const n = st === "triangle" ? r + 1 : 5;
+      label(ctx, "*".repeat(n), x + 6, y + (st === "line" ? 20 : 9 + r * 6.4), { size: 8, font: "mono", weight: 700, color: C.sun });
+    }
+    return;
+  }
+  if (st === "error") {
+    inkRect(ctx, 67, x + 4, y + 6, w - 8, 10, 2, { fill: C.coral, stroke: C.ink, lw: 1 });
+    label(ctx, "error", x + w / 2, y + 12, { size: 6.5, font: "mono", align: "center", weight: 700, color: C.paper });
+    for (let i = 0; i < 3; i++) {
+      ctx.fillStyle = C.muted;
+      ctx.fillRect(x + 6, y + 21 + i * 5, 24 + ((i * 11) % 18), 2);
+    }
+    return;
+  }
+  if (st === "mail") {
+    inkRect(ctx, 68, x + w / 2 - 12, y + 4, 24, 15, 2, { fill: C.paper, stroke: C.ink, lw: 1.5 });
+    inkPoly(ctx, 69, [[x + w / 2 - 12, y + 5], [x + w / 2, y + 13], [x + w / 2 + 12, y + 5]], { stroke: C.ink, lw: 1.5 }, false);
+    label(ctx, "Unfortunately…", x + w / 2, y + 28, { size: 6, font: "mono", align: "center" });
+    return;
+  }
   inkCircle(ctx, 62, x + w / 2, y + 13, 7, { fill: C.mint, stroke: C.ink, lw: 1.5 });
   inkPoly(ctx, 63, [[x + w / 2 - 3, y + 13], [x + w / 2 - 1, y + 16], [x + w / 2 + 4, y + 10]], { stroke: C.ink, lw: 1.5 }, false);
   label(ctx, "214 tests pass", x + w / 2, y + 28, { size: 6.5, font: "mono", align: "center" });
@@ -189,8 +233,23 @@ export function deskThing(ctx: CanvasRenderingContext2D, k: string, x: number, y
     inkRect(ctx, 72, x, y - 14, 16, 14, 2, { fill: C.paper, stroke: C.ink, lw: 1.5 });
     inkPoly(ctx, 73, [[x + 3, y - 10], [x + 13, y - 10]], { stroke: C.muted, lw: 1 }, false);
     inkPoly(ctx, 74, [[x + 3, y - 6], [x + 10, y - 6]], { stroke: C.muted, lw: 1 }, false);
-  } else if (k === "phone") {
+  } else if (k === "phone" || k === "look") {
     inkRect(ctx, 75, x, y - 3, 14, 3, 1, { fill: C.ink, stroke: C.ink, lw: 1.5 });
+  } else if (k === "listen") {
+    inkRect(ctx, 76, x, y - 13, 14, 13, 1, { fill: C.sun, stroke: C.ink, lw: 1.5 });
+    inkPoly(ctx, 77, [[x + 3, y - 8], [x + 11, y - 8]], { stroke: C.ink, lw: 1 }, false);
+  } else if (k === "check") {
+    inkRect(ctx, 78, x, y - 3, 18, 3, 1.5, { fill: C.coral, stroke: C.ink, lw: 1.5 });
+  } else if (k === "why") {
+    inkRect(ctx, 79, x + 2, y - 15, 10, 15, 1, { fill: C.paper, stroke: C.ink, lw: 1.5 });
+    inkPoly(ctx, 80, [[x + 4, y - 11], [x + 10, y - 11]], { stroke: C.muted, lw: 1 }, false);
+    inkPoly(ctx, 87, [[x + 4, y - 7], [x + 8, y - 7]], { stroke: C.muted, lw: 1 }, false);
+  } else if (k === "read") {
+    inkRect(ctx, 88, x, y - 6, 18, 6, 1, { fill: C.paper, stroke: C.ink, lw: 1.5 });
+    inkPoly(ctx, 89, [[x + 3, y - 3], [x + 15, y - 3]], { stroke: C.coralText, lw: 1 }, false);
+  } else if (k === "plain") {
+    inkRect(ctx, 100, x, y - 12, 14, 12, 1, { fill: C.cobaltLight, stroke: C.ink, lw: 1.5 });
+    inkPoly(ctx, 101, [[x + 3, y - 8], [x + 9, y - 8]], { stroke: C.ink, lw: 1 }, false);
   }
 }
 
@@ -269,7 +328,7 @@ function wallClock(x: number, y: number): Prop {
   };
 }
 
-export function buildOffice(): Scene {
+export function buildOffice(era: Era = "now"): Scene {
   const width = 1120;
   const wall = "#DCDFFD";
   const play: Prop[] = [
@@ -315,6 +374,18 @@ export function buildOffice(): Scene {
       if (env.w.monitor === "dark") {
         ctx.fillStyle = C.card;
         ctx.fillRect(x, y, 82, 54);
+        return;
+      }
+      if (env.w.monitor === "error") {
+        ctx.fillStyle = "#D93025";
+        ctx.fillRect(x, y, 82, 54);
+        label(ctx, "500", x + 41, y + 30, { size: 20, font: "mono", align: "center", weight: 800, color: C.paper });
+        return;
+      }
+      if (env.w.monitor === "ok") {
+        ctx.fillStyle = C.mint;
+        ctx.fillRect(x, y, 82, 54);
+        inkPoly(ctx, 158, [[x + 26, y + 28], [x + 37, y + 40], [x + 58, y + 14]], { stroke: C.ink, lw: 4 }, false);
         return;
       }
       if (env.w.monitor === "map") {
@@ -374,6 +445,7 @@ export function buildOffice(): Scene {
       ctx.fillRect(0, 0, W, H);
     },
     overlay: (ctx, env) => {
+      eraWash(ctx, era, width, env.evening >= 0.6);
       if (env.evening < 0.6) return;
       ctx.save();
       ctx.globalAlpha = 0.08;

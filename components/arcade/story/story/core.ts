@@ -19,7 +19,20 @@ export class Abort extends Error {}
 
 type Waiter = { test: () => boolean; resolve: () => void; reject: (e: unknown) => void };
 const STEP = 1 / 60;
-const NAMES: Record<Who, string> = { you: "You", tab: "Tab", zoya: "Zoya", chaiwala: "Chai stall", walker: "Stranger", narrator: "" };
+const NAMES: Record<Who, string> = {
+  you: "You",
+  tab: "Tab",
+  zoya: "Zoya",
+  chaiwala: "Chai stall",
+  walker: "Stranger",
+  narrator: "",
+  chintu: "Chintu",
+  sen: "Sen bhaiya",
+  arjun: "Arjun",
+  boss: "Boss",
+  customer: "Customer",
+  dad: "Dad",
+};
 
 export interface Goal {
   x: number;
@@ -41,6 +54,8 @@ export class Game {
   npcs: Record<string, Actor> = {};
   phone = new Phone();
   run: RunState = freshRun();
+  /** Who "you" is in the current chapter (speech bubble name). */
+  playerName = "Anukul";
   prefs: Prefs = defaultPrefs;
   reduced = false;
   time = 0;
@@ -52,6 +67,7 @@ export class Game {
   action: { label: string; press: () => void } | null = null;
   walkTarget: number | null = null;
   private pendingUse: string | null = null;
+  private autoAt = -1;
   goal: Goal | (() => Goal | null) | null = null;
   fresh = true;
   private pressId = 0;
@@ -99,6 +115,7 @@ export class Game {
     this.ui = createStore<Ui>({
       screen: "title",
       chapter: "",
+      goal: null,
       bubble: null,
       choices: null,
       prompt: null,
@@ -164,7 +181,7 @@ export class Game {
     this.showMap = false;
     this.tabScreen = false;
     this.suggestState = null;
-    this.ui.set({ bubble: null, choices: null, prompt: null, action: null, suggest: null, card: null, slot: null, stamp: null, end: null, hint: null, newKeepsake: null });
+    this.ui.set({ bubble: null, choices: null, prompt: null, action: null, suggest: null, card: null, slot: null, stamp: null, end: null, hint: null, goal: null, newKeepsake: null });
   }
 
   private onVis = () => {
@@ -246,13 +263,13 @@ export class Game {
 
   /** Blocking line (waits for advance). With `bark`, shows for N seconds and returns at once. */
   say(who: Who, text: string, o: { mood?: Mood; tab?: TabMood; voice?: string; bark?: number } = {}): Promise<void> {
-    text = text.replace(/\{name\}/g, this.run.name || "you");
+    text = text.replace(/\{name\}/g, this.playerName);
     const id = ++this.seq;
     if (o.mood && who !== "tab" && who !== "narrator") (this.speaker(who) as Actor | null)?.setMood(o.mood);
     if (o.tab) this.tab.mood = o.tab;
     const instant = this.reduced;
     const kind = who === "tab" ? "tab" : who === "narrator" ? "narration" : "human";
-    const name = who === "you" && this.run.name ? this.run.name : NAMES[who];
+    const name = who === "you" ? this.playerName || NAMES.you : NAMES[who];
     this.lastShown = instant ? text.length : 0;
     this.ui.set((s) => ({
       ...s,
@@ -497,6 +514,10 @@ export class Game {
     this.ui.set({ hint: h });
   }
 
+  setGoal(text: string | null) {
+    this.ui.set({ goal: text });
+  }
+
   setAction(label: string | null, press?: () => void) {
     this.action = label && press ? { label, press } : null;
     this.ui.set({ action: label ? { label } : null });
@@ -516,8 +537,8 @@ export class Game {
   checkpoint(id: string) {
     this.checkpointId = id;
     writeSave({
-      v: 2,
-      chapter: id === "prologue" || id === "finale" ? id : "real-time",
+      v: 3,
+      chapter: chapterOf(id),
       checkpoint: id,
       flags: this.run.flags,
       ledger: this.run.ledger,
@@ -621,6 +642,7 @@ export class Game {
       })
       .finally(() => {
         this.busy = false;
+        this.autoAt = this.time;
         if (h?.once) h.done = true;
       });
   }
@@ -787,7 +809,8 @@ export class Game {
       this.pendingUse = null;
     }
     const goal = typeof this.goal === "function" ? this.goal() : this.goal;
-    if (!ax && this.walkTarget === null && this.prefs.storyOnly && goal) {
+    // brief cooldown so explore() sees the handler settle before autopilot fires again
+    if (!ax && this.walkTarget === null && this.prefs.storyOnly && goal && this.time - this.autoAt > 0.4) {
       this.walkTarget = goal.x;
       if (goal.use) this.pendingUse = goal.use;
     }
@@ -870,33 +893,33 @@ export class Game {
     // screen-space
     ctx.setTransform(this.stage.px, 0, 0, this.stage.px, 0, 0);
     if (this.basement) this.drawBasement(ctx);
-    if (this.showMap) {
-      drawMiniMap(ctx, this.phone, env.clock, W - 174, 10, 164, 106, this.time);
-      if (this.inspectNote && this.inspectAmt > 0.05) {
-        // wrap by measured width, in the same font label() draws with
-        ctx.save();
-        ctx.font = `700 8.5px ${fonts().hand}`;
-        const lines: string[] = [];
-        let line = "";
-        for (const w of this.inspectNote.split(" ")) {
-          const next = line ? line + " " + w : w;
-          if (line && ctx.measureText(next).width > 148) {
-            lines.push(line);
-            line = w;
-          } else line = next;
-        }
-        lines.push(line);
-        ctx.globalAlpha = this.inspectAmt;
-        ctx.fillStyle = C.lilac;
-        ctx.strokeStyle = C.ink;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.roundRect(W - 174, 122, 164, lines.length * 11 + 10, 6);
-        ctx.fill();
-        ctx.stroke();
-        lines.forEach((l, i) => label(ctx, l, W - 166, 133 + i * 11, { size: 8.5, font: "hand", weight: 700 }));
-        ctx.restore();
+    if (this.showMap) drawMiniMap(ctx, this.phone, env.clock, W - 174, 10, 164, 106, this.time);
+    if (this.inspectNote && this.inspectAmt > 0.05) {
+      // under the map card on the street; top-right elsewhere
+      const top = this.showMap ? 122 : 10;
+      // wrap by measured width, in the same font label() draws with
+      ctx.save();
+      ctx.font = `700 8.5px ${fonts().hand}`;
+      const lines: string[] = [];
+      let line = "";
+      for (const w of this.inspectNote.split(" ")) {
+        const next = line ? line + " " + w : w;
+        if (line && ctx.measureText(next).width > 148) {
+          lines.push(line);
+          line = w;
+        } else line = next;
       }
+      lines.push(line);
+      ctx.globalAlpha = this.inspectAmt;
+      ctx.fillStyle = C.lilac;
+      ctx.strokeStyle = C.ink;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(W - 174, top, 164, lines.length * 11 + 10, 6);
+      ctx.fill();
+      ctx.stroke();
+      lines.forEach((l, i) => label(ctx, l, W - 166, top + 11 + i * 11, { size: 8.5, font: "hand", weight: 700 }));
+      ctx.restore();
     }
     if (this.replay) {
       ctx.save();
@@ -1058,11 +1081,9 @@ export class Game {
           sx = 420;
           sy = 140;
         } else {
-          const sp = this.speaker(b.who);
-          if (sp) {
-            const [wx, wy] = sp.headTop();
-            [sx, sy] = this.cam.toScreen(wx, wy);
-          }
+          // a voice with no actor (a phone call) anchors to the player
+          const [wx, wy] = (this.speaker(b.who) ?? this.you).headTop();
+          [sx, sy] = this.cam.toScreen(wx, wy);
         }
       }
       const bw = el.offsetWidth;
@@ -1086,6 +1107,11 @@ export class Game {
       }
     }
   }
+}
+
+const CHAPTERS = ["prologue", "meera", "sen", "ravi", "zoya", "finale"];
+function chapterOf(checkpoint: string) {
+  return CHAPTERS.includes(checkpoint) ? checkpoint : checkpoint === "done" ? "finale" : "anukul";
 }
 
 function verbFor(k: string) {

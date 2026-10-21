@@ -23,7 +23,7 @@ export interface RunState {
 
 export const freshRun = (name = ""): RunState => ({ flags: {}, ledger: freshLedger(), keepsakes: [], people: 0, chai: 0, understanding: 0, name });
 
-export type Who = "you" | "tab" | "zoya" | "chaiwala" | "walker" | "narrator";
+export type Who = "you" | "tab" | "zoya" | "chaiwala" | "walker" | "narrator" | "chintu" | "sen" | "arjun" | "boss" | "customer" | "dad";
 
 export interface KeepsakeDef {
   id: string;
@@ -32,13 +32,18 @@ export interface KeepsakeDef {
   piece: string;
 }
 
-/** Seven shelf slots across the full game; the slice can earn three. */
+/** Eight shelf slots across the full game. */
 export const KEEPSAKES: KeepsakeDef[] = [
+  { id: "listen", name: "A sticky note: call the customer", meaning: "I ask the real people.", piece: "I ask the real people." },
+  { id: "check", name: "A red pen", meaning: "I know what to check.", piece: "I know what to check." },
+  { id: "why", name: "A chai shop bill", meaning: "I ask why before I copy.", piece: "I ask why before I copy." },
+  { id: "read", name: "A printed error log", meaning: "I read the whole error.", piece: "I read the whole error." },
+  { id: "plain", name: "A notebook page of stars", meaning: "I think in plain words first.", piece: "I think in plain words first." },
   { id: "look", name: "The scuffed test phone", meaning: "I go and look.", piece: "I go and look." },
   { id: "sorry", name: "A card: moved back, sorry", meaning: "I tell the truth when I'm wrong.", piece: "I tell the truth when I'm wrong." },
   { id: "unknown", name: "A map label that says unknown", meaning: "I say unknown when I don't know.", piece: "I say unknown when I don't know." },
 ];
-export const SHELF_SLOTS = 7;
+export const SHELF_SLOTS = 8;
 
 export interface BubbleUi {
   id: number;
@@ -98,6 +103,7 @@ export interface EndUi {
 export interface Ui {
   screen: "title" | "play" | "end";
   chapter: string;
+  goal: string | null;
   bubble: BubbleUi | null;
   choices: ChoiceUi | null;
   prompt: { id: string; label: string; verb: string } | null;

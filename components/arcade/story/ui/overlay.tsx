@@ -22,6 +22,7 @@ const selStamp = (s: Ui) => s.stamp;
 const selAction = (s: Ui) => s.action;
 const selHint = (s: Ui) => s.hint;
 const selChapter = (s: Ui) => s.chapter;
+const selGoal = (s: Ui) => s.goal;
 const selKeeps = (s: Ui) => s.keepsakes;
 const selNew = (s: Ui) => s.newKeepsake;
 const selPrefs = (s: Ui) => s.prefs;
@@ -31,12 +32,18 @@ const selLog = (s: Ui) => s.log;
 
 export function Hud({ g, onPause }: { g: Game; onPause: () => void }) {
   const chapter = useUi(g, selChapter);
+  const goal = useUi(g, selGoal);
   const keeps = useUi(g, selKeeps);
   const fresh = useUi(g, selNew);
   const prefs = useUi(g, selPrefs);
   return (
     <header className="lw-hud">
-      <span className="lw-chapter">{chapter || "The Long Way to OK"}</span>
+      <span className="lw-hud-left">
+        <span className="lw-chapter">{chapter || "The Long Way to OK"}</span>
+        <span className="lw-goal" aria-live="polite">
+          {goal ? `Goal: ${goal}` : ""}
+        </span>
+      </span>
       <span className="lw-hud-right">
         <ol className="lw-shelf" aria-label={`Keepsake shelf, ${keeps.length} of ${SHELF_SLOTS}`}>
           {Array.from({ length: SHELF_SLOTS }, (_, i) => {
@@ -75,6 +82,40 @@ export function KeepIcon({ id }: { id: string }) {
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <rect x="4" y="5" width="16" height="14" rx="2" fill="#fff" stroke="#121217" strokeWidth="2" />
         <path d="M7 10h10M7 14h6" stroke="#55555F" strokeWidth="1.6" />
+      </svg>
+    );
+  if (id === "listen")
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="4" y="4" width="16" height="16" rx="2" fill="#FFC83D" stroke="#121217" strokeWidth="2" />
+        <path d="M8 10h8M8 14h5" stroke="#121217" strokeWidth="1.6" />
+      </svg>
+    );
+  if (id === "check")
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 18L17 7l2.5 2.5L8.5 20.5H6z" fill="#FF5B38" stroke="#121217" strokeWidth="2" strokeLinejoin="round" />
+      </svg>
+    );
+  if (id === "why")
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5z" fill="#fff" stroke="#121217" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M9 9h6M9 13h6" stroke="#55555F" strokeWidth="1.6" />
+      </svg>
+    );
+  if (id === "read")
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="3" width="14" height="18" rx="2" fill="#fff" stroke="#121217" strokeWidth="2" />
+        <path d="M8 8h8M8 12h8M8 16h5" stroke="#C7390F" strokeWidth="1.6" />
+      </svg>
+    );
+  if (id === "plain")
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="3" width="14" height="18" rx="2" fill="#DCDFFD" stroke="#121217" strokeWidth="2" />
+        <path d="M8 8h2M8 12h5M8 16h8" stroke="#121217" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     );
   return (

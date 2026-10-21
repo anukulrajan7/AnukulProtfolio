@@ -105,7 +105,7 @@ function BottomLayer({ g, compact }: { g: Game; compact: boolean }) {
   return <Controls g={g} compact />;
 }
 
-function start(g: Game, mode: "new" | "continue", name = "") {
+function start(g: Game, mode: "new" | "continue") {
   g.resetScripts();
   g.fresh = true;
   g.phone = new Phone();
@@ -117,7 +117,7 @@ function start(g: Game, mode: "new" | "continue", name = "") {
     from = save.checkpoint;
   } else {
     clearSave();
-    g.run = freshRun(name.trim().slice(0, 18));
+    g.run = freshRun();
   }
   g.ui.set({ screen: "play", keepsakes: [...g.run.keepsakes], end: null, paused: false });
   g.root.focus({ preventScroll: true });
@@ -127,20 +127,15 @@ function start(g: Game, mode: "new" | "continue", name = "") {
 function Title({ g }: { g: Game }) {
   const prefs = useUi(g, selPrefs);
   const hasSave = useUi(g, selHasSave);
-  const [name, setName] = useState("");
   const [opts, setOpts] = useState(false);
-  const go = useCallback((m: "new" | "continue") => start(g, m, name), [g, name]);
+  const go = useCallback((m: "new" | "continue") => start(g, m), [g]);
   return (
     <div className="lw-title">
       <div className="lw-title-card">
-        <p className="lw-kicker">a small story game · vertical slice</p>
+        <p className="lw-kicker">a small story game</p>
         <h2 className="lw-title-h">The Long Way to OK</h2>
-        <p className="lw-title-sub">A small game about learning to build things, in the years the machines learned too.</p>
-        <p className="lw-note">These are the beats of one real path, mine. Yours will rhyme. (Anukul)</p>
-        <label className="lw-name-field">
-          <span>Your name (optional)</span>
-          <input value={name} maxLength={18} placeholder="You" onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && go(hasSave ? "continue" : "new")} />
-        </label>
+        <p className="lw-title-sub">Five developers. Before AI, and after.</p>
+        <p className="lw-note">Four people you might know. And me. (Anukul)</p>
         <div className="lw-title-actions">
           {hasSave ? (
             <button type="button" className="lw-btn lw-btn-primary" onClick={() => go("continue")} autoFocus>
@@ -159,7 +154,7 @@ function Title({ g }: { g: Game }) {
         </div>
         {opts ? <Settings g={g} prefs={prefs} /> : null}
         <p className="lw-controls-help">
-          Walk <kbd>A</kbd>/<kbd>D</kbd> or arrows · use <kbd>E</kbd> · accept <kbd>Tab</kbd> · inspect hold <kbd>Q</kbd> · reject <kbd>R</kbd> · pause <kbd>Esc</kbd>. On a phone: tap to walk, tap glints, long-press to inspect. About 5 minutes.
+          Walk <kbd>A</kbd>/<kbd>D</kbd> or arrows · use <kbd>E</kbd> · accept <kbd>Tab</kbd> · inspect hold <kbd>Q</kbd> · reject <kbd>R</kbd> · pause <kbd>Esc</kbd>. On a phone: tap to walk, tap glints, long-press to inspect. About 20 minutes.
         </p>
       </div>
     </div>
@@ -218,7 +213,7 @@ function End({ g }: { g: Game }) {
   return (
     <div className="lw-modal lw-end">
       <div className="lw-modal-card lw-end-card">
-        <p className="lw-kicker">end of the slice</p>
+        <p className="lw-kicker">the end</p>
         <h2 className="lw-modal-h">OK.</h2>
         <div className="lw-ledger">
           <p>
@@ -245,9 +240,9 @@ function End({ g }: { g: Game }) {
             See the work page
           </Link>
         </div>
-        <p className="lw-note">Thanks for playing the slice. Six more chapters are on the way.</p>
+        <p className="lw-note">Thanks for playing. Five developers, one question: what do you do?</p>
         <div className="lw-title-actions">
-          <button type="button" className="lw-btn lw-btn-primary" onClick={() => start(g, "new", g.run.name)}>
+          <button type="button" className="lw-btn lw-btn-primary" onClick={() => start(g, "new")}>
             Play again
           </button>
           <Link className="lw-btn lw-btn-ghost" href="/arcade">
